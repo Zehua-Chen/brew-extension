@@ -24,11 +24,18 @@ let package = Package(
         .target(
             name: "BrewExtension",
             dependencies: []),
+        .target(
+            name: "Brew",
+            dependencies: []),
     	.target(
     	    name: "brew-extension",
-    	    dependencies: []),
+    	    dependencies: ["BrewExtension"]),
+
         .testTarget(
             name: "BrewExtensionTests",
             dependencies: ["BrewExtension"]),
+        .testTarget(
+            name: "BrewTests",
+            dependencies: ["Brew"]),
     ]
 )
