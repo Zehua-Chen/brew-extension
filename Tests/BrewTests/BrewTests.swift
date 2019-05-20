@@ -1,32 +1,47 @@
+//
+//  BrewTests.swift
+//  BrewExtension
+//
+//  Created by Zehua Chen on 5/20/19.
+//
+
 import XCTest
 @testable import Brew
 import Foundation
 
 final class BrewTests: XCTestCase {
 
-    func testList() {
-        let input = """
+    func testParseMultiColTable() {
+        let table = """
 aria2       git-lfs        libtiff        openssl        sqlite
 clang-format    icarus-verilog    mongodb        pkg-config    xz
 """
-        let formulaes = Brew._parseList(using: input)
-        let expected: [Formulae] = [
-            .init(name: "aria2"),
-            .init(name: "git-lfs"),
-            .init(name: "libtiff"),
-            .init(name: "openssl"),
-            .init(name: "sqlite"),
-            .init(name: "clang-format"),
-            .init(name: "icarus-verilog"),
-            .init(name: "mongodb"),
-            .init(name: "pkg-config"),
-            .init(name: "xz"),
+        let formulaes = Brew._parseTable(table)
+        let expected: [String] = [
+            "aria2",
+            "git-lfs",
+            "libtiff",
+            "openssl",
+            "sqlite",
+            "clang-format",
+            "icarus-verilog",
+            "mongodb",
+            "pkg-config",
+            "xz",
         ]
 
         XCTAssertEqual(formulaes, expected)
     }
 
-    func testDeps() {
+    func testParseSingleColTable() {
+        let table = """
+libffi
+pcre
+swig
+"""
+        let formulaes = Brew._parseTable(table)
+        let expected: [String] = ["libffi", "pcre", "swig"]
 
+        XCTAssertEqual(formulaes, expected)
     }
 }
