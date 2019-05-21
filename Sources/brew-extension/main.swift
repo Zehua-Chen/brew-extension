@@ -6,7 +6,10 @@
 //
 
 import BrewExtension
-import Brew
+import Foundation
 
-print(try! Brew.list())
-print(try! Brew.deps(for: "llvm"))
+print("loading data")
+let app = BrewExtension()
+try! app.sync()
+
+print(app.formulaes.inbound(at: "readline")!)

@@ -8,10 +8,10 @@
 import Foundation
 
 /// Interface to Homebrew
-public final class Brew {
+public struct Brew {
 
     /// Errors thrown during the execution of homebrew
-    public enum ProcessError: Error {
+    public enum BrewError: Error {
         /// stdout error occurs if it fails to read brew process'
         /// standard output
         case stdout
@@ -21,14 +21,20 @@ public final class Brew {
     }
 
     /// URL to homebrew executable
-    public static let url = URL(fileURLWithPath: "/usr/local/Homebrew/bin/brew")
+    public let url: URL
+
+    public init(
+        url: URL = URL(fileURLWithPath: "/usr/local/Homebrew/bin/brew")
+    ) {
+        self.url = url
+    }
 
     /// Get the dependencies of a formulae
     ///
     /// - Parameter name: the name of the formulae
     /// - Returns: a list of dependencies of the formulae
     /// - Throws: ProcessError if something go wrong running brew
-    public static func deps(for name: String) throws -> [String] {
+    public func deps(for name: String) throws -> [String] {
         let output = try _run(url: url, args: ["deps", name])
         return _parseTable(output)
     }
@@ -37,7 +43,7 @@ public final class Brew {
     ///
     /// - Returns: name of homebrew packages
     /// - Throws: ProcessError if something go wrong running brew
-    public static func list() throws -> [String] {
+    public func list() throws -> [String] {
         let output = try _run(url: url, args: ["list"])
         return _parseTable(output)
     }
@@ -46,7 +52,7 @@ public final class Brew {
     ///
     /// - Parameter table: the table string to parse
     /// - Returns: parsed items of the table
-    internal static func _parseTable(_ table: String) -> [String] {
+    internal func _parseTable(_ table: String) -> [String] {
         var formulaes = [String]()
         var buffer = ""
 
@@ -78,7 +84,7 @@ public final class Brew {
     ///   - args: args to give to the executable
     /// - Returns: standard output of the executable
     /// - Throws: ProcessError if something go wrong running brew
-    fileprivate static func _run(url: URL, args: [String]) throws -> String {
+    fileprivate func _run(url: URL, args: [String]) throws -> String {
         let process = Process()
         process.arguments = args
         process.executableURL = url
@@ -87,13 +93,13 @@ public final class Brew {
         process.launch()
 
         guard let outputPipe = process.standardOutput as? Pipe else {
-            throw ProcessError.stdout
+            throw BrewError.stdout
         }
 
         guard let text = String(
             data: outputPipe.fileHandleForReading.availableData,
             encoding: .utf8) else {
-            throw ProcessError.decoding
+            throw BrewError.decoding
         }
 
         return text
