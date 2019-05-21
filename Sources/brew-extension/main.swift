@@ -6,5 +6,7 @@
 //
 
 import BrewExtension
+import Brew
 
-print("brew extension")
+print(try! Brew.list())
+print(try! Brew.deps(for: "llvm"))

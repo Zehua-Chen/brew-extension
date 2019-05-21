@@ -8,14 +8,22 @@
 import Foundation
 
 public final class Brew {
-    public static let url = URL(fileURLWithPath: "")
 
-    public static func deps(for name: String) -> [String] {
-        return []
+    public enum ProcessError: Error {
+        case stdout
+        case decoding
     }
 
-    public static var list: [String] {
-        return []
+    public static let url = URL(fileURLWithPath: "/usr/local/Homebrew/bin/brew")
+
+    public static func deps(for name: String) throws -> [String] {
+        let output = try _run(url: url, args: ["deps", name])
+        return _parseTable(output)
+    }
+
+    public static func list() throws -> [String] {
+        let output = try _run(url: url, args: ["list"])
+        return _parseTable(output)
     }
 
     internal static func _parseTable(_ table: String) -> [String] {
@@ -41,5 +49,26 @@ public final class Brew {
         }
 
         return formulaes
+    }
+
+    fileprivate static func _run(url: URL, args: [String]) throws -> String {
+        let process = Process()
+        process.arguments = args
+        process.executableURL = url
+        process.standardOutput = Pipe()
+
+        process.launch()
+
+        guard let outputPipe = process.standardOutput as? Pipe else {
+            throw ProcessError.stdout
+        }
+
+        guard let text = String(
+            data: outputPipe.fileHandleForReading.availableData,
+            encoding: .utf8) else {
+            throw ProcessError.decoding
+        }
+
+        return text
     }
 }
