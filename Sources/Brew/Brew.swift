@@ -7,25 +7,45 @@
 
 import Foundation
 
+/// Interface to Homebrew
 public final class Brew {
 
+    /// Errors thrown during the execution of homebrew
     public enum ProcessError: Error {
+        /// stdout error occurs if it fails to read brew process'
+        /// standard output
         case stdout
+        /// decoding error occurs if there is something wrong decoding
+        /// brew process's standard output
         case decoding
     }
 
+    /// URL to homebrew executable
     public static let url = URL(fileURLWithPath: "/usr/local/Homebrew/bin/brew")
 
+    /// Get the dependencies of a formulae
+    ///
+    /// - Parameter name: the name of the formulae
+    /// - Returns: a list of dependencies of the formulae
+    /// - Throws: ProcessError if something go wrong running brew
     public static func deps(for name: String) throws -> [String] {
         let output = try _run(url: url, args: ["deps", name])
         return _parseTable(output)
     }
 
+    /// Get a list of installed homebrew packages
+    ///
+    /// - Returns: name of homebrew packages
+    /// - Throws: ProcessError if something go wrong running brew
     public static func list() throws -> [String] {
         let output = try _run(url: url, args: ["list"])
         return _parseTable(output)
     }
 
+    /// Parse table printed by homebrew
+    ///
+    /// - Parameter table: the table string to parse
+    /// - Returns: parsed items of the table
     internal static func _parseTable(_ table: String) -> [String] {
         var formulaes = [String]()
         var buffer = ""
@@ -51,6 +71,13 @@ public final class Brew {
         return formulaes
     }
 
+    /// Run command line application
+    ///
+    /// - Parameters:
+    ///   - url: url to the executable
+    ///   - args: args to give to the executable
+    /// - Returns: standard output of the executable
+    /// - Throws: ProcessError if something go wrong running brew
     fileprivate static func _run(url: URL, args: [String]) throws -> String {
         let process = Process()
         process.arguments = args
