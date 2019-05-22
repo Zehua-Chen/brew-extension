@@ -37,6 +37,8 @@ final class GraphTests: XCTestCase {
         XCTAssertTrue(graph.inbound(at: 2)!.isEmpty)
         XCTAssertTrue(graph.inbound(at: 3)!.isEmpty)
         XCTAssertTrue(graph.outbound(at: 3)!.isEmpty)
+
+        XCTAssertFalse(graph.contains(node: 1))
     }
 
     func testConnect() {

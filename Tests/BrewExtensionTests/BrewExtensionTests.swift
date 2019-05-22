@@ -3,7 +3,7 @@ import XCTest
 
 final class BrewExtensionTests: XCTestCase {
 
-    func testUninstallSingleDepth() {
+    func testUninstallSimple() {
         var graph = Graph<String>()
 
         graph.add(node: "to-be-uninstalled")
@@ -17,13 +17,40 @@ final class BrewExtensionTests: XCTestCase {
 
         let brewExt = BrewExtension()
         brewExt.formulaes = graph
-        let names = brewExt.itemsToBeUninstalled(for: "to-be-uninstalled")
+
+        let names = Set(brewExt.itemsToBeUninstalled(for: "to-be-uninstalled"))
 
         XCTAssertEqual(names.count, 2)
-        XCTAssertEqual(names, ["to-be-uninstalled", "llvm"])
+        XCTAssertTrue(names.contains("llvm"))
+        XCTAssertTrue(names.contains("to-be-uninstalled"))
     }
 
-    func testUninstallMultipleDepths() {
+    func testUninstallComplex() {
+        var graph = Graph<String>()
 
+        graph.add(node: "to-be-uninstalled")
+        graph.add(node: "llvm")
+        graph.add(node: "libffi")
+        graph.add(node: "python")
+        graph.add(node: "opencv")
+
+        graph.connect(from: "to-be-uninstalled", to: "llvm")
+        graph.connect(from: "to-be-uninstalled", to: "libffi")
+        graph.connect(from: "to-be-uninstalled", to: "python")
+
+        graph.connect(from: "opencv", to: "python")
+        graph.connect(from: "llvm", to: "libffi")
+
+        let brewExt = BrewExtension()
+        brewExt.formulaes = graph
+
+        let names = Set(brewExt.itemsToBeUninstalled(for: "to-be-uninstalled"))
+
+        XCTAssertEqual(names.count, 3)
+
+        XCTAssertTrue(names.contains("to-be-uninstalled"))
+        XCTAssertTrue(names.contains("llvm"))
+        XCTAssertTrue(names.contains("libffi"))
     }
 }
+

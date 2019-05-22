@@ -43,6 +43,8 @@ public struct Graph<Node: Hashable> {
         for outbound in nodeData.outbounds {
             _data[outbound]!.inbounds.remove(node)
         }
+        
+        _data.removeValue(forKey: node)
     }
 
     public mutating func connect(from source: Node, to target: Node) {

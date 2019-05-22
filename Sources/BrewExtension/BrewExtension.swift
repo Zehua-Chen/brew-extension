@@ -42,28 +42,44 @@ public final class BrewExtension {
 
     public func itemsToBeUninstalled(for formulae: String) -> [String] {
 
-        guard let outbounds = self.formulaes.outbound(at: formulae) else {
+        guard self.formulaes.contains(node: formulae) else {
             return []
         }
 
         var uninstalls = [String]()
-        uninstalls.append(formulae)
-        
-        for outbound in outbounds {
-            let outboundDependents = self.formulaes.inbound(at: outbound)!
-            if outboundDependents.contains(formulae) && outboundDependents.count == 1 {
-                uninstalls.append(outbound)
+        var stack = Set<String>()
+        stack.insert(formulae)
+
+        while !stack.isEmpty {
+            let current = stack.popFirst()!
+            let inbounds = self.formulaes.inbound(at: current)!
+
+            if inbounds.count == 0 {
+                uninstalls.append(current)
+                let outbounds = self.formulaes.outbound(at: current)!
+
+                for outbound in outbounds {
+                    if !stack.contains(outbound) {
+                        stack.insert(outbound)
+                    }
+                }
+
+                self.formulaes.remove(node: current)
             }
         }
 
         return uninstalls
     }
 
-    public func uninstall(formulae: String, hints: [String]? = nil) {
+    public func uninstall(formulae: String) {
 
     }
 
-    public func save<DB: DataBase>(to db: inout DB) {
+    public func rawUninstall(items: [String]? = nil) {
+
+    }
+
+    public func cache<DB: DataBase>(to db: inout DB) {
     }
 
     public func load<DB: DataBase>(from db: DB) {
