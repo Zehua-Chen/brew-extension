@@ -8,12 +8,12 @@
 public struct Graph<Node: Hashable> {
 
     fileprivate struct NodeData {
-        var inbound: Set<Node>
-        var outbound: Set<Node>
+        var inbounds: Set<Node>
+        var outbounds: Set<Node>
 
         init() {
-            self.inbound = Set<Node>()
-            self.outbound = Set<Node>()
+            self.inbounds = Set<Node>()
+            self.outbounds = Set<Node>()
         }
     }
 
@@ -33,16 +33,28 @@ public struct Graph<Node: Hashable> {
         }
     }
 
+    public mutating func remove(node: Node) {
+        guard let nodeData = _data[node] else { return }
+
+        for inbound in nodeData.inbounds {
+            _data[inbound]!.outbounds.remove(node)
+        }
+
+        for outbound in nodeData.outbounds {
+            _data[outbound]!.inbounds.remove(node)
+        }
+    }
+
     public mutating func connect(from source: Node, to target: Node) {
-        _data[source]?.outbound.insert(target)
-        _data[target]?.inbound.insert(source)
+        _data[source]?.outbounds.insert(target)
+        _data[target]?.inbounds.insert(source)
     }
 
     public func inbound(at node: Node) -> Set<Node>? {
-        return _data[node]?.inbound
+        return _data[node]?.inbounds
     }
 
     public func outbound(at node: Node) -> Set<Node>? {
-        return _data[node]?.outbound
+        return _data[node]?.outbounds
     }
 }

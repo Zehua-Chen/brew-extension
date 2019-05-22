@@ -20,6 +20,25 @@ final class GraphTests: XCTestCase {
         XCTAssertTrue(graph.contains(node: 2))
     }
 
+    func testRemove() {
+        var graph = Graph<Int>()
+
+        graph.add(node: 1)
+        graph.add(node: 2)
+        graph.add(node: 3)
+        graph.add(node: 4)
+
+        graph.connect(from: 1, to: 2)
+        graph.connect(from: 1, to: 3)
+        graph.connect(from: 4, to: 1)
+
+        graph.remove(node: 1)
+
+        XCTAssertTrue(graph.inbound(at: 2)!.isEmpty)
+        XCTAssertTrue(graph.inbound(at: 3)!.isEmpty)
+        XCTAssertTrue(graph.outbound(at: 3)!.isEmpty)
+    }
+
     func testConnect() {
         var graph = Graph<Int>()
 
