@@ -2,14 +2,28 @@ import XCTest
 @testable import BrewExtension
 
 final class BrewExtensionTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-//        XCTAssertEqual(BrewExtension().text, "Hello, World!")
+
+    func testUninstallSingleDepth() {
+        var graph = Graph<String>()
+
+        graph.add(node: "to-be-uninstalled")
+        graph.add(node: "llvm")
+        graph.add(node: "python")
+        graph.add(node: "sqlite")
+
+        graph.connect(from: "to-be-uninstalled", to: "llvm")
+        graph.connect(from: "to-be-uninstalled", to: "python")
+        graph.connect(from: "sqlite", to: "python")
+
+        let brewExt = BrewExtension()
+        brewExt.formulaes = graph
+        let names = brewExt.itemsToBeUninstalled(for: "to-be-uninstalled")
+
+        XCTAssertEqual(names.count, 2)
+        XCTAssertEqual(names, ["to-be-uninstalled", "llvm"])
     }
 
-    static var allTests = [
-        ("testExample", testExample),
-    ]
+    func testUninstallMultipleDepths() {
+
+    }
 }
