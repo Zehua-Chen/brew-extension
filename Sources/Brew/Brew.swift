@@ -20,6 +20,29 @@ public struct Brew {
         case decoding
     }
 
+    public struct FormulaeInfo: Decodable, CustomStringConvertible {
+
+        public enum Keys: CodingKey {
+            case name
+            case dependencies
+            case build_dependencies
+        }
+
+        var name: String
+        var deps: [String]
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: Keys.self)
+            self.name = try container.decode(String.self, forKey: .name)
+            self.deps = try container.decode(Array<String>.self, forKey: .dependencies)
+            self.deps.append(contentsOf: try container.decode(Array<String>.self, forKey: .build_dependencies))
+        }
+
+        public var description: String {
+            return "name = \(self.name), deps = \(self.deps)"
+        }
+    }
+
     /// URL to homebrew executable
     public let url: URL
 
@@ -35,8 +58,17 @@ public struct Brew {
     /// - Returns: a list of dependencies of the formulae
     /// - Throws: ProcessError if something go wrong running brew
     public func deps(for name: String) throws -> [String] {
-        let output = try _run(url: url, args: ["deps", name])
+        let output: String = try _run(args: ["deps", name])
         return _parseTable(output)
+    }
+
+    public func info(for names: [String]) throws -> [FormulaeInfo] {
+        var args = ["info", "--json"]
+        args.append(contentsOf: names)
+
+        let output: Data = try _run(args: args)
+        let decoder = JSONDecoder()
+        return try decoder.decode(Array<FormulaeInfo>.self, from: output)
     }
 
     /// Get a list of installed homebrew packages
@@ -44,7 +76,7 @@ public struct Brew {
     /// - Returns: name of homebrew packages
     /// - Throws: ProcessError if something go wrong running brew
     public func list() throws -> [String] {
-        let output = try _run(url: url, args: ["list"])
+        let output: String = try _run(args: ["list"])
         return _parseTable(output)
     }
 
@@ -80,14 +112,30 @@ public struct Brew {
     /// Run command line application
     ///
     /// - Parameters:
-    ///   - url: url to the executable
     ///   - args: args to give to the executable
-    /// - Returns: standard output of the executable
+    /// - Returns: string standard output of the executable
     /// - Throws: ProcessError if something go wrong running brew
-    fileprivate func _run(url: URL, args: [String]) throws -> String {
+    fileprivate func _run(args: [String]) throws -> String {
+
+        guard let text = String(
+            data: try _run(args: args),
+            encoding: .utf8) else {
+            throw BrewError.decoding
+        }
+
+        return text
+    }
+
+    /// Run command line application
+    ///
+    /// - Parameters:
+    ///   - args: args to give to the executable
+    /// - Returns: standard output data of the executable
+    /// - Throws: ProcessError if something go wrong running brew
+    fileprivate func _run(args: [String]) throws -> Data {
         let process = Process()
         process.arguments = args
-        process.executableURL = url
+        process.executableURL = self.url
         process.standardOutput = Pipe()
 
         process.launch()
@@ -96,12 +144,6 @@ public struct Brew {
             throw BrewError.stdout
         }
 
-        guard let text = String(
-            data: outputPipe.fileHandleForReading.availableData,
-            encoding: .utf8) else {
-            throw BrewError.decoding
-        }
-
-        return text
+        return outputPipe.fileHandleForReading.availableData
     }
 }
