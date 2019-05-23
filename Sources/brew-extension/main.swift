@@ -5,6 +5,7 @@
 //  Created by Zehua Chen on 5/20/19.
 //
 
+import Brew
 import BrewExtension
 import Foundation
 

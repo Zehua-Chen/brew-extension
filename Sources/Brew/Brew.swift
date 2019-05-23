@@ -22,14 +22,14 @@ public struct Brew {
 
     public struct FormulaeInfo: Decodable, CustomStringConvertible {
 
-        public enum Keys: CodingKey {
+        fileprivate enum Keys: CodingKey {
             case name
             case dependencies
             case build_dependencies
         }
 
-        var name: String
-        var deps: [String]
+        public var name: String
+        public var deps: [String]
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Keys.self)
@@ -67,6 +67,7 @@ public struct Brew {
         args.append(contentsOf: names)
 
         let output: Data = try _run(args: args)
+        print(String(data: output, encoding: .utf8)!)
         let decoder = JSONDecoder()
         return try decoder.decode(Array<FormulaeInfo>.self, from: output)
     }
@@ -144,6 +145,6 @@ public struct Brew {
             throw BrewError.stdout
         }
 
-        return outputPipe.fileHandleForReading.availableData
+        return outputPipe.fileHandleForReading.readDataToEndOfFile()
     }
 }

@@ -21,17 +21,22 @@ public final class BrewExtension {
     }
 
     public func sync() throws {
-        let formulaes = try self.brew.list()
+        let list = try self.brew.list()
+        let infos = try self.brew.info(for: list)
 
-        for formulae in formulaes {
-            self.formulaes.add(node: formulae)
+        for info in infos {
+            self.formulaes.add(node: info.name)
         }
 
-        for formulae in formulaes {
-            let deps = try self.brew.deps(for: formulae)
+        for info in infos {
+            let name = info.name
 
-            for dep in deps {
-                self.formulaes.connect(from: formulae, to: dep)
+            for dep in info.deps {
+                // Dependency relation is only constructed between
+                // installed formulaes
+                if self.formulaes.contains(node: dep) {
+                    self.formulaes.connect(from: name, to: dep)
+                }
             }
         }
     }
