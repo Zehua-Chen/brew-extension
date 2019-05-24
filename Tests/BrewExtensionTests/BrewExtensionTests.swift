@@ -4,12 +4,12 @@ import XCTest
 final class BrewExtensionTests: XCTestCase {
 
     func testUninstallSimple() {
-        var graph = Graph<String>()
+        var graph = Graph<String, FormulaeInfo>()
 
-        graph.add(node: "to-be-uninstalled")
-        graph.add(node: "llvm")
-        graph.add(node: "python")
-        graph.add(node: "sqlite")
+        graph.add(node: "to-be-uninstalled", with: FormulaeInfo())
+        graph.add(node: "llvm", with: FormulaeInfo())
+        graph.add(node: "python", with: FormulaeInfo())
+        graph.add(node: "sqlite", with: FormulaeInfo())
 
         graph.connect(from: "to-be-uninstalled", to: "llvm")
         graph.connect(from: "to-be-uninstalled", to: "python")
@@ -26,13 +26,13 @@ final class BrewExtensionTests: XCTestCase {
     }
 
     func testUninstallComplex() {
-        var graph = Graph<String>()
+        var graph = Graph<String, FormulaeInfo>()
 
-        graph.add(node: "to-be-uninstalled")
-        graph.add(node: "llvm")
-        graph.add(node: "libffi")
-        graph.add(node: "python")
-        graph.add(node: "opencv")
+        graph.add(node: "to-be-uninstalled", with: FormulaeInfo())
+        graph.add(node: "llvm", with: FormulaeInfo())
+        graph.add(node: "libffi", with: FormulaeInfo())
+        graph.add(node: "python", with: FormulaeInfo())
+        graph.add(node: "opencv", with: FormulaeInfo())
 
         graph.connect(from: "to-be-uninstalled", to: "llvm")
         graph.connect(from: "to-be-uninstalled", to: "libffi")

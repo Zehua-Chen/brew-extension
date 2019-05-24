@@ -10,7 +10,8 @@ import Foundation
 
 public final class BrewExtension {
 
-    public internal(set) var formulaes = Graph<String>()
+    public internal(set) var formulaes = Graph<String, FormulaeInfo>()
+    public internal(set) var changedFormulaes = Set<String>()
 
     public var brew: Brew
 
@@ -25,7 +26,7 @@ public final class BrewExtension {
         let infos = try self.brew.info(for: list)
 
         for info in infos {
-            self.formulaes.add(node: info.name)
+            self.formulaes.add(node: info.name, with: FormulaeInfo())
         }
 
         for info in infos {
@@ -57,15 +58,15 @@ public final class BrewExtension {
 
         while !stack.isEmpty {
             let current = stack.popFirst()!
-            let inbounds = self.formulaes.incomings(at: current)!
+            let incomings = self.formulaes.incomings(at: current)!
 
-            if inbounds.count == 0 {
+            if incomings.count == 0 {
                 uninstalls.append(current)
-                let outbounds = self.formulaes.outcomings(at: current)!
+                let outcomings = self.formulaes.outcomings(at: current)!
 
-                for outbound in outbounds {
-                    if !stack.contains(outbound) {
-                        stack.insert(outbound)
+                for outcoming in outcomings {
+                    if !stack.contains(outcoming) {
+                        stack.insert(outcoming)
                     }
                 }
 
@@ -77,6 +78,10 @@ public final class BrewExtension {
     }
 
     public func uninstall(formulae: String) {
+
+    }
+
+    public func commit() {
 
     }
 

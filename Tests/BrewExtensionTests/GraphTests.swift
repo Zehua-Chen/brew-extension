@@ -11,22 +11,22 @@ import BrewExtension
 final class GraphTests: XCTestCase {
     
     func testAdd() {
-        var graph = Graph<Int>()
+        var graph = Graph<Int, Int>()
 
-        graph.add(node: 0)
-        graph.add(node: 2)
+        graph.add(node: 0, with: 0)
+        graph.add(node: 2, with: 0)
 
         XCTAssertTrue(graph.contains(node: 0))
         XCTAssertTrue(graph.contains(node: 2))
     }
 
     func testRemove() {
-        var graph = Graph<Int>()
+        var graph = Graph<Int, Int>()
 
-        graph.add(node: 1)
-        graph.add(node: 2)
-        graph.add(node: 3)
-        graph.add(node: 4)
+        graph.add(node: 1, with: 0)
+        graph.add(node: 2, with: 0)
+        graph.add(node: 3, with: 0)
+        graph.add(node: 4, with: 0)
 
         graph.connect(from: 1, to: 2)
         graph.connect(from: 1, to: 3)
@@ -42,11 +42,11 @@ final class GraphTests: XCTestCase {
     }
 
     func testConnect() {
-        var graph = Graph<Int>()
+        var graph = Graph<Int, Int>()
 
-        graph.add(node: 0)
-        graph.add(node: 1)
-        graph.add(node: 2)
+        graph.add(node: 0, with: 0)
+        graph.add(node: 1, with: 0)
+        graph.add(node: 2, with: 0)
 
         graph.connect(from: 1, to: 0)
         graph.connect(from: 2, to: 0)
@@ -68,15 +68,15 @@ final class GraphTests: XCTestCase {
     }
 
     func testSequence() {
-        var graph = Graph<Int>()
-        graph.add(node: 1)
-        graph.add(node: 2)
-        graph.add(node: 3)
+        var graph = Graph<Int, Int>()
+        graph.add(node: 1, with: 0)
+        graph.add(node: 2, with: 0)
+        graph.add(node: 3, with: 0)
 
         var sum = 0
 
         for item in graph {
-            sum += item
+            sum += item.node
         }
 
         XCTAssertEqual(sum, 6)

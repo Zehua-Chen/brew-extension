@@ -6,26 +6,28 @@
 //
 
 /// A directed edge graph
-public struct Graph<Node: Hashable>: Sequence {
+public struct Graph<Node: Hashable, Data>: Sequence {
 
     /// The data of each node
-    public struct NodeData {
+    fileprivate struct _NodeData {
         /// The node that have incomming connections to "this" node
-        var incomings: Set<Node>
+        var incomings = Set<Node>()
         /// The node that have outcoming connections to "this" node
-        var outcomings: Set<Node>
+        var outcomings = Set<Node>()
+        var data: Data?
 
         /// Create an empty node data.
+        init(data: Data) {
+            self.data = data
+        }
+
         init() {
-            self.incomings = Set<Node>()
-            self.outcomings = Set<Node>()
+            self.data = nil
         }
     }
 
-    /// Data type of the graph
-    public typealias Data = [Node: NodeData]
     /// Data of the graph
-    fileprivate var _data: Data
+    fileprivate var _data: [Node: _NodeData]
 
     /// Creates an empty graph
     public init() {
@@ -40,12 +42,23 @@ public struct Graph<Node: Hashable>: Sequence {
         return _data[node] != nil
     }
 
-    /// Add a new node
+    /// Add a new node without associated data
     ///
     /// - Parameter node: the node to add
     public mutating func add(node: Node) {
         if _data[node] == nil {
-            _data[node] = NodeData()
+            _data[node] = _NodeData()
+        }
+    }
+
+    /// Add a new node with associated value
+    ///
+    /// - Parameters:
+    ///   - node: the node to add
+    ///   - data: data to be associated with the node
+    public mutating func add(node: Node, with data: Data) {
+        if _data[node] == nil {
+            _data[node] = _NodeData(data: data)
         }
     }
 
@@ -80,8 +93,8 @@ public struct Graph<Node: Hashable>: Sequence {
     ///
     /// - Parameter node: the node to query
     /// - Returns: a `NodeData` instance, if the node exists
-    public func data(for node: Node) -> NodeData? {
-        return _data[node]
+    public func data(for node: Node) -> Data? {
+        return _data[node]?.data
     }
 
     /// Get the nodes that have incoming connections to a node
@@ -100,20 +113,28 @@ public struct Graph<Node: Hashable>: Sequence {
         return _data[node]?.outcomings
     }
 
+    /// Get or set the associated data with the node
+    ///
+    /// - Parameter node: the associated node
+    public subscript(node: Node) -> Data? {
+        get { return _data[node]?.data }
+        set { _data[node]?.data = newValue }
+    }
+
     // Sequence Conformance
 
     /// Iteratoar that go over the nodes of the graph
     public struct Iterator: IteratorProtocol {
 
         /// Element is the type of the nodes
-        public typealias Element = Node
+        public typealias Element = (node: Node, data: Data?)
         /// The iterator to the node storage type's iterator
-        fileprivate var _iter: Data.Iterator
+        fileprivate var _iter: Dictionary<Node, _NodeData>.Iterator
 
         /// Create an iterator from an existing node storage type's iterator
         ///
         /// - Parameter iter: the source iterator
-        fileprivate init(from iter: Data.Iterator) {
+        fileprivate init(from iter: Dictionary<Node, _NodeData>.Iterator) {
             _iter = iter
         }
 
@@ -121,7 +142,11 @@ public struct Graph<Node: Hashable>: Sequence {
         ///
         /// - Returns: a node if the iterator is not at the end, nil otherwise
         public mutating func next() -> Element? {
-            return _iter.next()?.key
+            if let element = _iter.next() {
+                return (node: element.key, data: element.value.data)
+            }
+
+            return nil
         }
     }
 
