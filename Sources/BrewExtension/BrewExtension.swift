@@ -15,6 +15,18 @@ public final class BrewExtension {
 
     public var brew: Brew
 
+    public var uninstalled: Set<String> {
+        var temp = Set<String>()
+
+        for node in self.formulaes {
+            if node.data?.action == .uninstall {
+                temp.insert(node.node)
+            }
+        }
+
+        return temp
+    }
+
     public init(
         url: URL = URL(fileURLWithPath: "/usr/local/Homebrew/bin/brew")
     ) {
@@ -46,23 +58,20 @@ public final class BrewExtension {
 
     }
 
-    public func itemsToBeUninstalled(for formulae: String) -> [String] {
+    public func uninstall(formulae: String) {
 
-        guard self.formulaes.contains(node: formulae) else {
-            return []
-        }
+        guard self.formulaes.contains(node: formulae) else { return }
 
-        var uninstalls = [String]()
+        var graph = self.formulaes
         var stack = Set<String>()
         stack.insert(formulae)
 
         while !stack.isEmpty {
             let current = stack.popFirst()!
-            let incomings = self.formulaes.incomings(at: current)!
+            let incomings = graph.incomings(at: current)!
 
             if incomings.count == 0 {
-                uninstalls.append(current)
-                let outcomings = self.formulaes.outcomings(at: current)!
+                let outcomings = graph.outcomings(at: current)!
 
                 for outcoming in outcomings {
                     if !stack.contains(outcoming) {
@@ -70,15 +79,10 @@ public final class BrewExtension {
                     }
                 }
 
-                self.formulaes.remove(node: current)
+                self.formulaes[current]!.action = .uninstall
+                graph.remove(node: current)
             }
         }
-
-        return uninstalls
-    }
-
-    public func uninstall(formulae: String) {
-
     }
 
     public func commit() {

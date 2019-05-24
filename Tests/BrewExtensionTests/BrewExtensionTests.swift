@@ -18,7 +18,8 @@ final class BrewExtensionTests: XCTestCase {
         let brewExt = BrewExtension()
         brewExt.formulaes = graph
 
-        let names = Set(brewExt.itemsToBeUninstalled(for: "to-be-uninstalled"))
+        brewExt.uninstall(formulae: "to-be-uninstalled")
+        let names = brewExt.uninstalled
 
         XCTAssertEqual(names.count, 2)
         XCTAssertTrue(names.contains("llvm"))
@@ -44,7 +45,8 @@ final class BrewExtensionTests: XCTestCase {
         let brewExt = BrewExtension()
         brewExt.formulaes = graph
 
-        let names = Set(brewExt.itemsToBeUninstalled(for: "to-be-uninstalled"))
+        brewExt.uninstall(formulae: "to-be-uninstalled")
+        let names = brewExt.uninstalled
 
         XCTAssertEqual(names.count, 3)
 
