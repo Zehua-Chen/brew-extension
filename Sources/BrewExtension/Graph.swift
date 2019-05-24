@@ -5,19 +5,21 @@
 //  Created by Zehua Chen on 5/21/19.
 //
 
-public struct Graph<Node: Hashable> {
+public struct Graph<Node: Hashable>: Sequence {
 
-    fileprivate struct NodeData {
-        var inbounds: Set<Node>
-        var outbounds: Set<Node>
+    public struct NodeData {
+        var incomings: Set<Node>
+        var outcomings: Set<Node>
 
         init() {
-            self.inbounds = Set<Node>()
-            self.outbounds = Set<Node>()
+            self.incomings = Set<Node>()
+            self.outcomings = Set<Node>()
         }
     }
 
-    fileprivate var _data: [Node: NodeData]
+    public typealias Data = [Node: NodeData]
+
+    fileprivate var _data: Data
 
     public init() {
         _data = [:]
@@ -36,27 +38,52 @@ public struct Graph<Node: Hashable> {
     public mutating func remove(node: Node) {
         guard let nodeData = _data[node] else { return }
 
-        for inbound in nodeData.inbounds {
-            _data[inbound]!.outbounds.remove(node)
+        for inbound in nodeData.incomings {
+            _data[inbound]!.outcomings.remove(node)
         }
 
-        for outbound in nodeData.outbounds {
-            _data[outbound]!.inbounds.remove(node)
+        for outbound in nodeData.outcomings {
+            _data[outbound]!.incomings.remove(node)
         }
         
         _data.removeValue(forKey: node)
     }
 
     public mutating func connect(from source: Node, to target: Node) {
-        _data[source]?.outbounds.insert(target)
-        _data[target]?.inbounds.insert(source)
+        _data[source]?.outcomings.insert(target)
+        _data[target]?.incomings.insert(source)
     }
 
-    public func inbound(at node: Node) -> Set<Node>? {
-        return _data[node]?.inbounds
+    public func data(for node: Node) -> NodeData? {
+        return _data[node]
     }
 
-    public func outbound(at node: Node) -> Set<Node>? {
-        return _data[node]?.outbounds
+    public func incomings(at node: Node) -> Set<Node>? {
+        return _data[node]?.incomings
+    }
+
+    public func outcomings(at node: Node) -> Set<Node>? {
+        return _data[node]?.outcomings
+    }
+
+    // Sequence Conformance
+
+    public struct Iterator: IteratorProtocol {
+
+        public typealias Element = Node
+
+        fileprivate var _iter: Data.Iterator
+
+        public init(from iter: Data.Iterator) {
+            _iter = iter
+        }
+
+        public mutating func next() -> Element? {
+            return _iter.next()?.key
+        }
+    }
+
+    public func makeIterator() -> Iterator {
+        return Iterator(from: _data.makeIterator())
     }
 }

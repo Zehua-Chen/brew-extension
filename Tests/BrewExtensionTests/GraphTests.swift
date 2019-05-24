@@ -34,9 +34,9 @@ final class GraphTests: XCTestCase {
 
         graph.remove(node: 1)
 
-        XCTAssertTrue(graph.inbound(at: 2)!.isEmpty)
-        XCTAssertTrue(graph.inbound(at: 3)!.isEmpty)
-        XCTAssertTrue(graph.outbound(at: 3)!.isEmpty)
+        XCTAssertTrue(graph.incomings(at: 2)!.isEmpty)
+        XCTAssertTrue(graph.incomings(at: 3)!.isEmpty)
+        XCTAssertTrue(graph.outcomings(at: 3)!.isEmpty)
 
         XCTAssertFalse(graph.contains(node: 1))
     }
@@ -54,16 +54,31 @@ final class GraphTests: XCTestCase {
         graph.connect(from: 0, to: 1)
         graph.connect(from: 0, to: 2)
 
-        let zeroInBound = graph.inbound(at: 0)
+        let zeroInBound = graph.incomings(at: 0)
 
         XCTAssertNotNil(zeroInBound)
         XCTAssertTrue(zeroInBound!.contains(1))
         XCTAssertTrue(zeroInBound!.contains(2))
 
-        let zeroOutBound = graph.inbound(at: 0)
+        let zeroOutBound = graph.incomings(at: 0)
 
         XCTAssertNotNil(zeroOutBound)
         XCTAssertTrue(zeroOutBound!.contains(1))
         XCTAssertTrue(zeroOutBound!.contains(2))
+    }
+
+    func testSequence() {
+        var graph = Graph<Int>()
+        graph.add(node: 1)
+        graph.add(node: 2)
+        graph.add(node: 3)
+
+        var sum = 0
+
+        for item in graph {
+            sum += item
+        }
+
+        XCTAssertEqual(sum, 6)
     }
 }

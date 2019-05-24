@@ -13,4 +13,4 @@ print("loading data")
 let app = BrewExtension()
 try! app.sync()
 
-print(app.formulaes.inbound(at: "readline")!)
+print(app.formulaes.incomings(at: "readline")!)

@@ -57,11 +57,11 @@ public final class BrewExtension {
 
         while !stack.isEmpty {
             let current = stack.popFirst()!
-            let inbounds = self.formulaes.inbound(at: current)!
+            let inbounds = self.formulaes.incomings(at: current)!
 
             if inbounds.count == 0 {
                 uninstalls.append(current)
-                let outbounds = self.formulaes.outbound(at: current)!
+                let outbounds = self.formulaes.outcomings(at: current)!
 
                 for outbound in outbounds {
                     if !stack.contains(outbound) {
@@ -77,10 +77,6 @@ public final class BrewExtension {
     }
 
     public func uninstall(formulae: String) {
-
-    }
-
-    public func rawUninstall(items: [String]? = nil) {
 
     }
 
