@@ -12,20 +12,8 @@ public final class BrewExtension {
 
     public internal(set) var formulaes = Graph<String, FormulaeInfo>()
     public internal(set) var changedFormulaes = Set<String>()
-
     public var brew: Brew
-
-    public var uninstalled: Set<String> {
-        var temp = Set<String>()
-
-        for node in self.formulaes {
-            if node.data?.action == .uninstall {
-                temp.insert(node.node)
-            }
-        }
-
-        return temp
-    }
+    public var uninstalls = [String]()
 
     public init(
         url: URL = URL(fileURLWithPath: "/usr/local/Homebrew/bin/brew")
@@ -81,6 +69,7 @@ public final class BrewExtension {
 
                 self.formulaes[current]!.action = .uninstall
                 graph.remove(node: current)
+                uninstalls.append(current)
             }
         }
     }

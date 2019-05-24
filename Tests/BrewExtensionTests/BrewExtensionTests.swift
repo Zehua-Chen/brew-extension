@@ -6,53 +6,96 @@ final class BrewExtensionTests: XCTestCase {
     func testUninstallSimple() {
         var graph = Graph<String, FormulaeInfo>()
 
-        graph.add(node: "to-be-uninstalled", with: FormulaeInfo())
-        graph.add(node: "llvm", with: FormulaeInfo())
-        graph.add(node: "python", with: FormulaeInfo())
-        graph.add(node: "sqlite", with: FormulaeInfo())
+        graph.add(node: "target", with: FormulaeInfo())
+        graph.add(node: "0-1", with: FormulaeInfo())
+        graph.add(node: "1-1", with: FormulaeInfo())
+        graph.add(node: "1-2", with: FormulaeInfo())
 
-        graph.connect(from: "to-be-uninstalled", to: "llvm")
-        graph.connect(from: "to-be-uninstalled", to: "python")
-        graph.connect(from: "sqlite", to: "python")
+        graph.connect(from: "target", to: "1-1")
+        graph.connect(from: "target", to: "1-2")
+        graph.connect(from: "0-1", to: "1-2")
 
         let brewExt = BrewExtension()
         brewExt.formulaes = graph
 
-        brewExt.uninstall(formulae: "to-be-uninstalled")
-        let names = brewExt.uninstalled
+        brewExt.uninstall(formulae: "target")
+        let names = Set(brewExt.uninstalls)
 
+        XCTAssertEqual(brewExt.uninstalls.count, 2)
         XCTAssertEqual(names.count, 2)
-        XCTAssertTrue(names.contains("llvm"))
-        XCTAssertTrue(names.contains("to-be-uninstalled"))
+
+        XCTAssertTrue(names.contains("1-1"))
+        XCTAssertTrue(names.contains("target"))
     }
 
     func testUninstallComplex() {
         var graph = Graph<String, FormulaeInfo>()
 
-        graph.add(node: "to-be-uninstalled", with: FormulaeInfo())
-        graph.add(node: "llvm", with: FormulaeInfo())
-        graph.add(node: "libffi", with: FormulaeInfo())
-        graph.add(node: "python", with: FormulaeInfo())
-        graph.add(node: "opencv", with: FormulaeInfo())
+        graph.add(node: "target", with: FormulaeInfo())
+        graph.add(node: "0-1", with: FormulaeInfo())
+        graph.add(node: "1-0", with: FormulaeInfo())
+        graph.add(node: "1-1", with: FormulaeInfo())
+        graph.add(node: "1-2", with: FormulaeInfo())
 
-        graph.connect(from: "to-be-uninstalled", to: "llvm")
-        graph.connect(from: "to-be-uninstalled", to: "libffi")
-        graph.connect(from: "to-be-uninstalled", to: "python")
+        graph.connect(from: "target", to: "1-0")
+        graph.connect(from: "target", to: "1-1")
+        graph.connect(from: "target", to: "1-2")
 
-        graph.connect(from: "opencv", to: "python")
-        graph.connect(from: "llvm", to: "libffi")
+        graph.connect(from: "0-1", to: "1-2")
+        graph.connect(from: "1-0", to: "1-1")
 
         let brewExt = BrewExtension()
         brewExt.formulaes = graph
 
-        brewExt.uninstall(formulae: "to-be-uninstalled")
-        let names = brewExt.uninstalled
+        brewExt.uninstall(formulae: "target")
+        let names = Set(brewExt.uninstalls)
 
+        XCTAssertEqual(brewExt.uninstalls.count, 3)
         XCTAssertEqual(names.count, 3)
 
-        XCTAssertTrue(names.contains("to-be-uninstalled"))
-        XCTAssertTrue(names.contains("llvm"))
-        XCTAssertTrue(names.contains("libffi"))
+        XCTAssertTrue(names.contains("target"))
+        XCTAssertTrue(names.contains("1-0"))
+        XCTAssertTrue(names.contains("1-1"))
+    }
+
+    func testUninstallMultiDepth() {
+        var graph = Graph<String, FormulaeInfo>()
+
+        graph.add(node: "target", with: FormulaeInfo())
+        graph.add(node: "0-1", with: FormulaeInfo())
+        graph.add(node: "1-0", with: FormulaeInfo())
+        graph.add(node: "1-1", with: FormulaeInfo())
+        graph.add(node: "1-2", with: FormulaeInfo())
+        graph.add(node: "2-0", with: FormulaeInfo())
+        graph.add(node: "2-1", with: FormulaeInfo())
+        graph.add(node: "3-0", with: FormulaeInfo())
+
+        graph.connect(from: "target", to: "1-0")
+        graph.connect(from: "target", to: "1-1")
+        graph.connect(from: "target", to: "1-2")
+        graph.connect(from: "0-1", to: "1-2")
+
+        graph.connect(from: "1-0", to: "1-1")
+        graph.connect(from: "1-0", to: "2-0")
+        graph.connect(from: "1-1", to: "2-1")
+
+        graph.connect(from: "2-1", to: "3-0")
+
+        let brewExt = BrewExtension()
+        brewExt.formulaes = graph
+
+        brewExt.uninstall(formulae: "target")
+        let names = Set(brewExt.uninstalls)
+
+        XCTAssertEqual(brewExt.uninstalls.count, 6)
+        XCTAssertEqual(names.count, 6)
+
+        XCTAssertTrue(names.contains("target"))
+        XCTAssertTrue(names.contains("1-0"))
+        XCTAssertTrue(names.contains("1-1"))
+        XCTAssertTrue(names.contains("2-0"))
+        XCTAssertTrue(names.contains("2-1"))
+        XCTAssertTrue(names.contains("3-0"))
     }
 }
 

@@ -14,15 +14,11 @@ public struct Graph<Node: Hashable, Data>: Sequence {
         var incomings = Set<Node>()
         /// The node that have outcoming connections to "this" node
         var outcomings = Set<Node>()
-        var data: Data?
+        var data: Data
 
         /// Create an empty node data.
         init(data: Data) {
             self.data = data
-        }
-
-        init() {
-            self.data = nil
         }
     }
 
@@ -40,15 +36,6 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// - Returns: true if the node exists, false otherwise
     public func contains(node: Node) -> Bool {
         return _data[node] != nil
-    }
-
-    /// Add a new node without associated data
-    ///
-    /// - Parameter node: the node to add
-    public mutating func add(node: Node) {
-        if _data[node] == nil {
-            _data[node] = _NodeData()
-        }
     }
 
     /// Add a new node with associated value
@@ -118,7 +105,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// - Parameter node: the associated node
     public subscript(node: Node) -> Data? {
         get { return _data[node]?.data }
-        set { _data[node]?.data = newValue }
+        set { _data[node]?.data = newValue! }
     }
 
     // Sequence Conformance
