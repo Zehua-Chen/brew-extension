@@ -2,14 +2,100 @@ import XCTest
 @testable import BrewExtension
 
 final class BrewExtensionTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-//        XCTAssertEqual(BrewExtension().text, "Hello, World!")
+
+    func testUninstallSimple() {
+        var graph = Graph<String, FormulaeInfo>()
+
+        graph.add(node: "target", with: FormulaeInfo())
+        graph.add(node: "0-1", with: FormulaeInfo())
+        graph.add(node: "1-1", with: FormulaeInfo())
+        graph.add(node: "1-2", with: FormulaeInfo())
+
+        graph.connect(from: "target", to: "1-1")
+        graph.connect(from: "target", to: "1-2")
+        graph.connect(from: "0-1", to: "1-2")
+
+        let brewExt = BrewExtension()
+        brewExt.formulaes = graph
+
+        brewExt.uninstall(formulae: "target")
+        let names = Set(brewExt.uninstalls)
+
+        XCTAssertEqual(brewExt.uninstalls.count, 2)
+        XCTAssertEqual(names.count, 2)
+
+        XCTAssertTrue(names.contains("1-1"))
+        XCTAssertTrue(names.contains("target"))
     }
 
-    static var allTests = [
-        ("testExample", testExample),
-    ]
+    func testUninstallComplex() {
+        var graph = Graph<String, FormulaeInfo>()
+
+        graph.add(node: "target", with: FormulaeInfo())
+        graph.add(node: "0-1", with: FormulaeInfo())
+        graph.add(node: "1-0", with: FormulaeInfo())
+        graph.add(node: "1-1", with: FormulaeInfo())
+        graph.add(node: "1-2", with: FormulaeInfo())
+
+        graph.connect(from: "target", to: "1-0")
+        graph.connect(from: "target", to: "1-1")
+        graph.connect(from: "target", to: "1-2")
+
+        graph.connect(from: "0-1", to: "1-2")
+        graph.connect(from: "1-0", to: "1-1")
+
+        let brewExt = BrewExtension()
+        brewExt.formulaes = graph
+
+        brewExt.uninstall(formulae: "target")
+        let names = Set(brewExt.uninstalls)
+
+        XCTAssertEqual(brewExt.uninstalls.count, 3)
+        XCTAssertEqual(names.count, 3)
+
+        XCTAssertTrue(names.contains("target"))
+        XCTAssertTrue(names.contains("1-0"))
+        XCTAssertTrue(names.contains("1-1"))
+    }
+
+    func testUninstallMultiDepth() {
+        var graph = Graph<String, FormulaeInfo>()
+
+        graph.add(node: "target", with: FormulaeInfo())
+        graph.add(node: "0-1", with: FormulaeInfo())
+        graph.add(node: "1-0", with: FormulaeInfo())
+        graph.add(node: "1-1", with: FormulaeInfo())
+        graph.add(node: "1-2", with: FormulaeInfo())
+        graph.add(node: "2-0", with: FormulaeInfo())
+        graph.add(node: "2-1", with: FormulaeInfo())
+        graph.add(node: "3-0", with: FormulaeInfo())
+
+        graph.connect(from: "target", to: "1-0")
+        graph.connect(from: "target", to: "1-1")
+        graph.connect(from: "target", to: "1-2")
+        graph.connect(from: "0-1", to: "1-2")
+
+        graph.connect(from: "1-0", to: "1-1")
+        graph.connect(from: "1-0", to: "2-0")
+        graph.connect(from: "1-1", to: "2-1")
+
+        graph.connect(from: "2-1", to: "3-0")
+
+        let brewExt = BrewExtension()
+        brewExt.formulaes = graph
+
+        brewExt.uninstall(formulae: "target")
+        let names = Set(brewExt.uninstalls)
+
+        XCTAssertEqual(brewExt.uninstalls.count, 6)
+        XCTAssertEqual(names.count, 6)
+
+        XCTAssertTrue(names.contains("target"))
+        XCTAssertTrue(names.contains("1-0"))
+        XCTAssertTrue(names.contains("1-1"))
+        XCTAssertTrue(names.contains("2-0"))
+        XCTAssertTrue(names.contains("2-1"))
+        XCTAssertTrue(names.contains("3-0"))
+    }
 }
+

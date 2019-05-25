@@ -5,8 +5,12 @@
 //  Created by Zehua Chen on 5/20/19.
 //
 
-import BrewExtension
 import Brew
+import BrewExtension
+import Foundation
 
-print(try! Brew.list())
-print(try! Brew.deps(for: "llvm"))
+let app = BrewExtension()
+try! app.sync()
+app.uninstall(formulae: "ghostscript")
+print(app.uninstalls)
+//try! app.commit()
