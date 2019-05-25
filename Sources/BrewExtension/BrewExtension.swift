@@ -11,7 +11,6 @@ import Foundation
 public final class BrewExtension {
 
     public internal(set) var formulaes = Graph<String, FormulaeInfo>()
-    public internal(set) var changedFormulaes = Set<String>()
     public var brew: Brew
     public var uninstalls = [String]()
 
@@ -74,8 +73,15 @@ public final class BrewExtension {
         }
     }
 
-    public func commit() {
-
+    public func commit() throws {
+        for item in self.formulaes {
+            switch item.data.action {
+            case .nothing:
+                continue
+            case .uninstall:
+                try brew.uninstall(formulae: item.node)
+            }
+        }
     }
 
     public func cache<DB: DataBase>(to db: inout DB) {

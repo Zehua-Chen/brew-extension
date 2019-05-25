@@ -114,7 +114,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     public struct Iterator: IteratorProtocol {
 
         /// Element is the type of the nodes
-        public typealias Element = (node: Node, data: Data?)
+        public typealias Element = (node: Node, data: Data)
         /// The iterator to the node storage type's iterator
         fileprivate var _iter: Dictionary<Node, _NodeData>.Iterator
 

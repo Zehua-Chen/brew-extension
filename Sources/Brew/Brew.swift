@@ -72,6 +72,10 @@ public struct Brew {
         return try decoder.decode(Array<FormulaeInfo>.self, from: output)
     }
 
+    public func uninstall(formulae name: String) throws {
+        let _: String = try _run(args: ["uninstall", name])
+    }
+
     /// Get a list of installed homebrew packages
     ///
     /// - Returns: name of homebrew packages

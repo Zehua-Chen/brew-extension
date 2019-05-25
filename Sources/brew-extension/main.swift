@@ -9,8 +9,8 @@ import Brew
 import BrewExtension
 import Foundation
 
-print("loading data")
 let app = BrewExtension()
 try! app.sync()
-
-print(app.formulaes.incomings(at: "readline")!)
+app.uninstall(formulae: "ghostscript")
+print(app.uninstalls)
+//try! app.commit()
