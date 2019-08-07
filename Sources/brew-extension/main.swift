@@ -13,7 +13,7 @@ let brewExt = BrewExtension()
 var app = CommandLineApplication(name: "brew-extension")
 
 let sync = try! app.addPath(["brew-extension", "sync"]) { (context) in
-    try! brewExt.sync()
+//    try! brewExt.sync()
 }
 
 let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in

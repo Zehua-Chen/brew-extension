@@ -34,7 +34,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     ///
     /// - Parameter node: the node to lookup
     /// - Returns: true if the node exists, false otherwise
-    public func contains(node: Node) -> Bool {
+    public func contains(_ node: Node) -> Bool {
         return _data[node] != nil
     }
 
@@ -43,7 +43,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// - Parameters:
     ///   - node: the node to add
     ///   - data: data to be associated with the node
-    public mutating func add(node: Node, with data: Data) {
+    public mutating func insert(_ node: Node, with data: Data) {
         if _data[node] == nil {
             _data[node] = _NodeData(data: data)
         }
@@ -52,7 +52,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// Remove a node
     ///
     /// - Parameter node: the node to remove
-    public mutating func remove(node: Node) {
+    public mutating func remove(_ node: Node) {
         guard let nodeData = _data[node] else { return }
 
         for inbound in nodeData.incomings {

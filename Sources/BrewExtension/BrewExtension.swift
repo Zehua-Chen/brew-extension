@@ -20,12 +20,12 @@ public final class BrewExtension {
         self.brew = Brew(url: url)
     }
 
-    public func sync() throws {
+    public func sync<DB: DataBase>(into db: DB) throws {
         let list = try self.brew.list()
-        let infos = try self.brew.info(for: list)
+        let infos = try self.brew.info(of: list)
 
         for info in infos {
-            self.formulaes.add(node: info.name, with: FormulaeInfo())
+            self.formulaes.insert(info.name, with: FormulaeInfo())
         }
 
         for info in infos {
@@ -34,7 +34,7 @@ public final class BrewExtension {
             for dep in info.deps {
                 // Dependency relation is only constructed between
                 // installed formulaes
-                if self.formulaes.contains(node: dep) {
+                if self.formulaes.contains(dep) {
                     self.formulaes.connect(from: name, to: dep)
                 }
             }
@@ -47,7 +47,7 @@ public final class BrewExtension {
 
     public func uninstall(formulae: String) {
 
-        guard self.formulaes.contains(node: formulae) else { return }
+        guard self.formulaes.contains(formulae) else { return }
 
         var graph = self.formulaes
         var stack = Set<String>()
@@ -67,7 +67,7 @@ public final class BrewExtension {
                 }
 
                 self.formulaes[current]!.action = .uninstall
-                graph.remove(node: current)
+                graph.remove(current)
                 uninstalls.append(current)
             }
         }
@@ -82,11 +82,5 @@ public final class BrewExtension {
                 try brew.uninstall(formulae: item.node)
             }
         }
-    }
-
-    public func cache<DB: DataBase>(to db: inout DB) {
-    }
-
-    public func load<DB: DataBase>(from db: DB) {
     }
 }

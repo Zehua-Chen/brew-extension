@@ -20,29 +20,6 @@ public struct Brew {
         case decoding
     }
 
-    public struct FormulaeInfo: Decodable, CustomStringConvertible {
-
-        fileprivate enum Keys: CodingKey {
-            case name
-            case dependencies
-            case build_dependencies
-        }
-
-        public var name: String
-        public var deps: [String]
-
-        public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: Keys.self)
-            self.name = try container.decode(String.self, forKey: .name)
-            self.deps = try container.decode(Array<String>.self, forKey: .dependencies)
-            self.deps.append(contentsOf: try container.decode(Array<String>.self, forKey: .build_dependencies))
-        }
-
-        public var description: String {
-            return "name = \(self.name), deps = \(self.deps)"
-        }
-    }
-
     /// URL to homebrew executable
     public let url: URL
 
@@ -62,9 +39,14 @@ public struct Brew {
         return _parseTable(output)
     }
 
-    public func info(for names: [String]) throws -> [FormulaeInfo] {
+    /// Get info of names
+    ///
+    /// - Parameter formulaes: the formulaes of get info for
+    /// - Returns: Formulae infos
+    /// - Throws: 
+    public func info(of formulaes: [String]) throws -> [FormulaeInfo] {
         var args = ["info", "--json"]
-        args.append(contentsOf: names)
+        args.append(contentsOf: formulaes)
 
         let output: Data = try _run(args: args)
         print(String(data: output, encoding: .utf8)!)
