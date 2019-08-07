@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SwiftArgParse",
+        "repositoryURL": "https://github.com/Zehua-Chen/swift-argparse",
+        "state": {
+          "branch": null,
+          "revision": "fbcf5a9864816519d9213d7a9d6d7342d0803718",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "SwiftQueue",
+        "repositoryURL": "https://github.com/Zehua-Chen/swift-queue.git",
+        "state": {
+          "branch": null,
+          "revision": "73fa754a86eac8f2e7b15265a24f2eb512c3ccff",
+          "version": "1.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

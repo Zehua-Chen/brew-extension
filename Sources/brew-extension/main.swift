@@ -7,10 +7,23 @@
 
 import Brew
 import BrewExtension
-import Foundation
+import SwiftArgParse
 
-let app = BrewExtension()
-try! app.sync()
-app.uninstall(formulae: "ghostscript")
-print(app.uninstalls)
-//try! app.commit()
+let brewExt = BrewExtension()
+var app = CommandLineApplication(name: "brew-extension")
+
+let sync = try! app.addPath(["brew-extension", "sync"]) { (context) in
+    try! brewExt.sync()
+}
+
+let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
+}
+
+uninstall.registerNamedParam("-y", defaultValue: false)
+uninstall.addUnnamedParam(String.self)
+
+do {
+    try app.run()
+} catch {
+    print(error)
+}
