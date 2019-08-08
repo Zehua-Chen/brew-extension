@@ -40,4 +40,11 @@ struct JsonDataBase: DataBase {
             manager.createFile(atPath: rawJsonPath, contents: data, attributes: nil)
         }
     }
+
+    func loadFormulaes() -> Graph<String, FormulaeInfo> {
+        let decoder = JSONDecoder()
+        let data = try! Data(contentsOf: URL(fileURLWithPath: "\(url.path)/raw.json"))
+
+        return try! decoder.decode(Graph<String, FormulaeInfo>.self, from: data)
+    }
 }
