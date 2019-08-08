@@ -3,7 +3,7 @@
 ## Commands
 
 ````
-brew sync
+brew-extension sync
 ````
 
 ### Parameters
@@ -11,7 +11,7 @@ brew sync
 - `--path`: the path to which information is stored; default is `~/.brew-extension`
 
 ````
-brew uninstall <name>
+brew-extension uninstall <name>
 ````
 
 ### Parameters
