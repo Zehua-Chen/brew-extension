@@ -20,34 +20,47 @@ public final class BrewExtension {
         self.brew = Brew(url: url)
     }
 
-    public func sync() throws {
+    /// Fetch formulae info from homebrew
+    ///
+    /// - Throws:
+    public func fetch() throws {
         let list = try self.brew.list()
-        let infos = try self.brew.info(for: list)
+        let rawInfos = try self.brew.info(of: list)
 
-        for info in infos {
-            self.formulaes.add(node: info.name, with: FormulaeInfo())
+        for info in rawInfos {
+            // TODO: init formulae info
+            self.formulaes.insert(info.name, with: FormulaeInfo())
         }
 
-        for info in infos {
+        // build connections
+
+        for info in rawInfos {
             let name = info.name
 
             for dep in info.deps {
                 // Dependency relation is only constructed between
                 // installed formulaes
-                if self.formulaes.contains(node: dep) {
+                if self.formulaes.contains(dep) {
                     self.formulaes.connect(from: name, to: dep)
                 }
             }
         }
     }
 
-    public func install(formulae: String) {
+    /// Sync the information of the brew extension into a database
+    ///
+    /// - Parameter db: the data base to write into
+    public func flush<DB: DataBase>(into db: inout DB) {
+        db.saveFormulaes(self.formulaes)
+    }
 
+    public func load<DB: DataBase>(from db: DB) {
+        self.formulaes = db.loadFormulaes()
     }
 
     public func uninstall(formulae: String) {
 
-        guard self.formulaes.contains(node: formulae) else { return }
+        guard self.formulaes.contains(formulae) else { return }
 
         var graph = self.formulaes
         var stack = Set<String>()
@@ -65,28 +78,10 @@ public final class BrewExtension {
                         stack.insert(outcoming)
                     }
                 }
-
-                self.formulaes[current]!.action = .uninstall
-                graph.remove(node: current)
+                
+                graph.remove(current)
                 uninstalls.append(current)
             }
         }
-    }
-
-    public func commit() throws {
-        for item in self.formulaes {
-            switch item.data.action {
-            case .nothing:
-                continue
-            case .uninstall:
-                try brew.uninstall(formulae: item.node)
-            }
-        }
-    }
-
-    public func cache<DB: DataBase>(to db: inout DB) {
-    }
-
-    public func load<DB: DataBase>(from db: DB) {
     }
 }

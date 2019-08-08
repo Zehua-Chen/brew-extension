@@ -22,6 +22,12 @@ public struct Graph<Node: Hashable, Data>: Sequence {
         }
     }
 
+    fileprivate enum _GraphKeys: CodingKey {
+        case data
+    }
+
+    fileprivate typealias _Data = [Node: _NodeData]
+
     /// Data of the graph
     fileprivate var _data: [Node: _NodeData]
 
@@ -34,7 +40,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     ///
     /// - Parameter node: the node to lookup
     /// - Returns: true if the node exists, false otherwise
-    public func contains(node: Node) -> Bool {
+    public func contains(_ node: Node) -> Bool {
         return _data[node] != nil
     }
 
@@ -43,7 +49,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// - Parameters:
     ///   - node: the node to add
     ///   - data: data to be associated with the node
-    public mutating func add(node: Node, with data: Data) {
+    public mutating func insert(_ node: Node, with data: Data) {
         if _data[node] == nil {
             _data[node] = _NodeData(data: data)
         }
@@ -52,7 +58,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// Remove a node
     ///
     /// - Parameter node: the node to remove
-    public mutating func remove(node: Node) {
+    public mutating func remove(_ node: Node) {
         guard let nodeData = _data[node] else { return }
 
         for inbound in nodeData.incomings {
@@ -142,5 +148,24 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// - Returns: an iterator instance
     public func makeIterator() -> Iterator {
         return Iterator(from: _data.makeIterator())
+    }
+}
+
+// MARK: Encodable Decodable Conformance
+
+extension Graph._NodeData: Encodable where Node: Encodable, Data: Encodable {}
+extension Graph._NodeData: Decodable where Node: Decodable, Data: Decodable {}
+
+extension Graph: Encodable where Node: Encodable, Data: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: _GraphKeys.self)
+        try container.encode(_data, forKey: .data)
+    }
+}
+
+extension Graph: Decodable where Node: Decodable, Data: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: _GraphKeys.self)
+        _data = try container.decode(_Data.self, forKey: .data)
     }
 }

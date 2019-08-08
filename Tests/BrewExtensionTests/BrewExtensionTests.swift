@@ -6,10 +6,10 @@ final class BrewExtensionTests: XCTestCase {
     func testUninstallSimple() {
         var graph = Graph<String, FormulaeInfo>()
 
-        graph.add(node: "target", with: FormulaeInfo())
-        graph.add(node: "0-1", with: FormulaeInfo())
-        graph.add(node: "1-1", with: FormulaeInfo())
-        graph.add(node: "1-2", with: FormulaeInfo())
+        graph.insert("target", with: FormulaeInfo())
+        graph.insert("0-1", with: FormulaeInfo())
+        graph.insert("1-1", with: FormulaeInfo())
+        graph.insert("1-2", with: FormulaeInfo())
 
         graph.connect(from: "target", to: "1-1")
         graph.connect(from: "target", to: "1-2")
@@ -31,11 +31,11 @@ final class BrewExtensionTests: XCTestCase {
     func testUninstallComplex() {
         var graph = Graph<String, FormulaeInfo>()
 
-        graph.add(node: "target", with: FormulaeInfo())
-        graph.add(node: "0-1", with: FormulaeInfo())
-        graph.add(node: "1-0", with: FormulaeInfo())
-        graph.add(node: "1-1", with: FormulaeInfo())
-        graph.add(node: "1-2", with: FormulaeInfo())
+        graph.insert("target", with: FormulaeInfo())
+        graph.insert("0-1", with: FormulaeInfo())
+        graph.insert("1-0", with: FormulaeInfo())
+        graph.insert("1-1", with: FormulaeInfo())
+        graph.insert("1-2", with: FormulaeInfo())
 
         graph.connect(from: "target", to: "1-0")
         graph.connect(from: "target", to: "1-1")
@@ -61,14 +61,14 @@ final class BrewExtensionTests: XCTestCase {
     func testUninstallMultiDepth() {
         var graph = Graph<String, FormulaeInfo>()
 
-        graph.add(node: "target", with: FormulaeInfo())
-        graph.add(node: "0-1", with: FormulaeInfo())
-        graph.add(node: "1-0", with: FormulaeInfo())
-        graph.add(node: "1-1", with: FormulaeInfo())
-        graph.add(node: "1-2", with: FormulaeInfo())
-        graph.add(node: "2-0", with: FormulaeInfo())
-        graph.add(node: "2-1", with: FormulaeInfo())
-        graph.add(node: "3-0", with: FormulaeInfo())
+        graph.insert("target", with: FormulaeInfo())
+        graph.insert("0-1", with: FormulaeInfo())
+        graph.insert("1-0", with: FormulaeInfo())
+        graph.insert("1-1", with: FormulaeInfo())
+        graph.insert("1-2", with: FormulaeInfo())
+        graph.insert("2-0", with: FormulaeInfo())
+        graph.insert("2-1", with: FormulaeInfo())
+        graph.insert("3-0", with: FormulaeInfo())
 
         graph.connect(from: "target", to: "1-0")
         graph.connect(from: "target", to: "1-1")
