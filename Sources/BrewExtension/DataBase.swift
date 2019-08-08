@@ -6,4 +6,5 @@
 //
 
 public protocol DataBase {
+    mutating func saveFormulaes(_ formulaes: Graph<String, FormulaeInfo>)
 }

@@ -49,8 +49,8 @@ public struct Brew {
         args.append(contentsOf: formulaes)
 
         let output: Data = try _run(args: args)
-        print(String(data: output, encoding: .utf8)!)
         let decoder = JSONDecoder()
+        
         return try decoder.decode(Array<FormulaeInfo>.self, from: output)
     }
 

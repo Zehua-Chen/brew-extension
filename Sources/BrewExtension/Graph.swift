@@ -22,6 +22,12 @@ public struct Graph<Node: Hashable, Data>: Sequence {
         }
     }
 
+    fileprivate enum _GraphKeys: CodingKey {
+        case data
+    }
+
+    fileprivate typealias _Data = [Node: _NodeData]
+
     /// Data of the graph
     fileprivate var _data: [Node: _NodeData]
 
@@ -142,5 +148,24 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// - Returns: an iterator instance
     public func makeIterator() -> Iterator {
         return Iterator(from: _data.makeIterator())
+    }
+}
+
+// MARK: Encodable Decodable Conformance
+
+extension Graph._NodeData: Encodable where Node: Encodable, Data: Encodable {}
+extension Graph._NodeData: Decodable where Node: Decodable, Data: Decodable {}
+
+extension Graph: Encodable where Node: Encodable, Data: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: _GraphKeys.self)
+        try container.encode(_data, forKey: .data)
+    }
+}
+
+extension Graph: Decodable where Node: Decodable, Data: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: _GraphKeys.self)
+        _data = try container.decode(_Data.self, forKey: .data)
     }
 }

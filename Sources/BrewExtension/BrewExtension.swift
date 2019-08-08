@@ -20,15 +20,21 @@ public final class BrewExtension {
         self.brew = Brew(url: url)
     }
 
-    public func sync<DB: DataBase>(into db: DB) throws {
+    /// Fetch formulae info from homebrew
+    ///
+    /// - Throws:
+    public func fetch() throws {
         let list = try self.brew.list()
-        let infos = try self.brew.info(of: list)
+        let rawInfos = try self.brew.info(of: list)
 
-        for info in infos {
+        for info in rawInfos {
+            // TODO: init formulae info
             self.formulaes.insert(info.name, with: FormulaeInfo())
         }
 
-        for info in infos {
+        // build connections
+
+        for info in rawInfos {
             let name = info.name
 
             for dep in info.deps {
@@ -41,46 +47,53 @@ public final class BrewExtension {
         }
     }
 
+    /// Sync the information of the brew extension into a database
+    ///
+    /// - Parameter db: the data base to write into
+    public func sync<DB: DataBase>(into db: inout DB) {
+        db.saveFormulaes(self.formulaes)
+    }
+
     public func install(formulae: String) {
 
     }
 
     public func uninstall(formulae: String) {
 
-        guard self.formulaes.contains(formulae) else { return }
-
-        var graph = self.formulaes
-        var stack = Set<String>()
-        stack.insert(formulae)
-
-        while !stack.isEmpty {
-            let current = stack.popFirst()!
-            let incomings = graph.incomings(at: current)!
-
-            if incomings.count == 0 {
-                let outcomings = graph.outcomings(at: current)!
-
-                for outcoming in outcomings {
-                    if !stack.contains(outcoming) {
-                        stack.insert(outcoming)
-                    }
-                }
-
-                self.formulaes[current]!.action = .uninstall
-                graph.remove(current)
-                uninstalls.append(current)
-            }
-        }
+//        guard self.formulaes.contains(formulae) else { return }
+//
+//        var graph = self.formulaes
+//        var stack = Set<String>()
+//        stack.insert(formulae)
+//
+//        while !stack.isEmpty {
+//            let current = stack.popFirst()!
+//            let incomings = graph.incomings(at: current)!
+//
+//            if incomings.count == 0 {
+//                let outcomings = graph.outcomings(at: current)!
+//
+//                for outcoming in outcomings {
+//                    if !stack.contains(outcoming) {
+//                        stack.insert(outcoming)
+//                    }
+//                }
+//
+//                self.formulaes[current]!.action = .uninstall
+//                graph.remove(current)
+//                uninstalls.append(current)
+//            }
+//        }
     }
 
     public func commit() throws {
-        for item in self.formulaes {
-            switch item.data.action {
-            case .nothing:
-                continue
-            case .uninstall:
-                try brew.uninstall(formulae: item.node)
-            }
-        }
+//        for item in self.formulaes {
+//            switch item.data.action {
+//            case .nothing:
+//                continue
+//            case .uninstall:
+//                try brew.uninstall(formulae: item.node)
+//            }
+//        }
     }
 }
