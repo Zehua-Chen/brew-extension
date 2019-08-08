@@ -58,10 +58,6 @@ public final class BrewExtension {
         self.formulaes = db.loadFormulaes()
     }
 
-    public func install(formulae: String) {
-
-    }
-
     public func uninstall(formulae: String) {
 
         guard self.formulaes.contains(formulae) else { return }
@@ -87,16 +83,5 @@ public final class BrewExtension {
                 uninstalls.append(current)
             }
         }
-    }
-
-    public func commit() throws {
-//        for item in self.formulaes {
-//            switch item.data.action {
-//            case .nothing:
-//                continue
-//            case .uninstall:
-//                try brew.uninstall(formulae: item.node)
-//            }
-//        }
     }
 }
