@@ -10,7 +10,7 @@ import Foundation
 
 struct JsonDataBase: DataBase {
 
-    static func makeDefault(path: String) -> JsonDataBase {
+    static func createOrLoad(from path: String) -> JsonDataBase {
         let url = URL(fileURLWithPath: path, isDirectory: true)
         let manager = FileManager.default
 
@@ -21,29 +21,37 @@ struct JsonDataBase: DataBase {
         return JsonDataBase(url: url)
     }
 
-    var url: URL
+    var folderURL: URL
+    var fileURL: URL
 
+    /// Initialize a json data base
+    ///
+    /// - Parameter url: the url that points to a folder where the data base
+    /// stores its content
     init(url: URL) {
-        self.url = url
+        self.folderURL = url
+        self.fileURL = self.folderURL.appendingPathComponent("formulaes.json")
     }
 
     mutating func saveFormulaes(_ info: Graph<String, FormulaeInfo>) {
         let encoder = JSONEncoder()
         let data = try! encoder.encode(info)
-        let rawJsonPath = "\(url.path)/raw.json"
 
         let manager = FileManager.default
 
-        if manager.fileExists(atPath: rawJsonPath) {
-            try! data.write(to: URL(fileURLWithPath: rawJsonPath))
+        if manager.fileExists(atPath: self.fileURL.path) {
+            try! data.write(to: self.fileURL)
         } else {
-            manager.createFile(atPath: rawJsonPath, contents: data, attributes: nil)
+            manager.createFile(atPath: self.fileURL.path, contents: data, attributes: nil)
         }
     }
 
     func loadFormulaes() -> Graph<String, FormulaeInfo> {
         let decoder = JSONDecoder()
-        let data = try! Data(contentsOf: URL(fileURLWithPath: "\(url.path)/raw.json"))
+
+        guard let data = try? Data(contentsOf: fileURL) else {
+            return .init()
+        }
 
         return try! decoder.decode(Graph<String, FormulaeInfo>.self, from: data)
     }

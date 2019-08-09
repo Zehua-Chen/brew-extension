@@ -1,6 +1,6 @@
 //
-//  Formulae.swift
-//  BrewExtension
+//  main.swift
+//  brew-extension
 //
 //  Created by Zehua Chen on 5/20/19.
 //
@@ -23,18 +23,16 @@ let sync = try! app.addPath(["brew-extension", "sync"]) { (context) in
 
     logger.info("connecting to database")
 
-    var db = JsonDataBase.makeDefault(path: dataPath)
+    var db = JsonDataBase.createOrLoad(from: dataPath)
     logger.notice("database at \(dataPath)")
 
     do {
         logger.info("fetching data from homebrew")
-        try brewExt.fetch()
+        try brewExt.sync(into: &db)
+        logger.info("saving to database")
     } catch {
         print(error)
     }
-
-    logger.info("saving to database")
-    brewExt.flush(into: &db)
 }
 
 sync.registerNamedParam("--path", defaultValue: dataPath)
@@ -48,10 +46,10 @@ let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
 
     logger.info("connecting to database")
 
-    let db = JsonDataBase.makeDefault(path: dataPath)
+    let db = JsonDataBase.createOrLoad(from: dataPath)
     logger.notice("database at \(dataPath)")
 
-    brewExt.load(from: db)
+    try! brewExt.load(from: db)
     brewExt.uninstall(formulae: context.unnamedParams[0] as! String)
 
     let uninstalls = brewExt.uninstalls

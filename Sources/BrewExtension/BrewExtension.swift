@@ -11,6 +11,7 @@ import Foundation
 public final class BrewExtension {
 
     public internal(set) var formulaes = Graph<String, FormulaeInfo>()
+
     public var brew: Brew
     public var uninstalls = [String]()
 
@@ -20,12 +21,14 @@ public final class BrewExtension {
         self.brew = Brew(url: url)
     }
 
-    /// Fetch formulae info from homebrew
+    /// Sync formulae info with homebrew
     ///
     /// - Throws:
-    public func fetch() throws {
+    public func sync<DB: DataBase>(into db: inout DB) throws {
         let list = try self.brew.list()
         let rawInfos = try self.brew.info(of: list)
+
+        self.formulaes = .init()
 
         for info in rawInfos {
             // TODO: init formulae info
@@ -45,17 +48,27 @@ public final class BrewExtension {
                 }
             }
         }
+
+        // Merge formulae infos
+
+        let existingFormulaes = try db.loadFormulaes()
+
+        for existingFormulae in existingFormulaes {
+            self.formulaes[existingFormulae.node] = existingFormulae.data
+        }
+
+        try db.saveFormulaes(self.formulaes)
     }
 
     /// Sync the information of the brew extension into a database
     ///
     /// - Parameter db: the data base to write into
-    public func flush<DB: DataBase>(into db: inout DB) {
-        db.saveFormulaes(self.formulaes)
+    public func flush<DB: DataBase>(into db: inout DB) throws {
+        try db.saveFormulaes(self.formulaes)
     }
 
-    public func load<DB: DataBase>(from db: DB) {
-        self.formulaes = db.loadFormulaes()
+    public func load<DB: DataBase>(from db: DB) throws {
+        self.formulaes = try db.loadFormulaes()
     }
 
     public func uninstall(formulae: String) {

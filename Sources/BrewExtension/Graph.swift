@@ -111,7 +111,11 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// - Parameter node: the associated node
     public subscript(node: Node) -> Data? {
         get { return _data[node]?.data }
-        set { _data[node]?.data = newValue! }
+        set {
+            if let value = newValue {
+                _data[node]?.data = value
+            }
+        }
     }
 
     // Sequence Conformance

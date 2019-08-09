@@ -41,12 +41,12 @@ public struct Brew {
 
     /// Get info of names
     ///
-    /// - Parameter formulaes: the formulaes of get info for
+    /// - Parameter names: the name of the formulaes to get info for
     /// - Returns: Formulae infos
     /// - Throws: 
-    public func info(of formulaes: [String]) throws -> [FormulaeInfo] {
+    public func info(of names: [String]) throws -> [FormulaeInfo] {
         var args = ["info", "--json"]
-        args.append(contentsOf: formulaes)
+        args.append(contentsOf: names)
 
         let output: Data = try _run(args: args)
         let decoder = JSONDecoder()
