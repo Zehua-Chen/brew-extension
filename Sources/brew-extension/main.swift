@@ -50,7 +50,7 @@ let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
     logger.notice("database at \(dataPath)")
 
     try! brewExt.load(from: db)
-    brewExt.uninstall(formulae: context.unnamedParams[0] as! String)
+    brewExt.uninstallFormulae(context.unnamedParams[0] as! String)
 
     let uninstalls = brewExt.uninstalls
 
@@ -59,11 +59,7 @@ let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
     var yes = context.namedParams["-y"] as! Bool
 
     if !yes {
-        print("uninstall? (y/f)", separator: "", terminator: "")
-
-        if let line = readLine() {
-            yes = line == "y"
-        }
+        yes = Input<Bool>.read(prompt: "uninstall? (y/f)", defaultValue: false)
     }
 
     if yes {
