@@ -6,12 +6,10 @@
 //
 
 public struct FormulaeInfo: Encodable, Decodable {
-    var isUserPackage = false
-    var folder = ""
-    
-    public init() {}
-    
-    public init(isUserPackage: Bool, folder: String) {
+    var isUserPackage: Bool
+    var folder: String
+
+    public init(isUserPackage: Bool = false, folder: String = "") {
         self.isUserPackage = isUserPackage
         self.folder = folder
     }

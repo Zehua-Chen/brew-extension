@@ -9,29 +9,38 @@
 public struct Graph<Node: Hashable, Data>: Sequence {
 
     /// The data of each node
-    fileprivate struct _NodeData {
+    @usableFromInline
+    internal struct _NodeData {
         /// The node that have incomming connections to "this" node
+        @usableFromInline
         var incomings = Set<Node>()
+
         /// The node that have outcoming connections to "this" node
+        @usableFromInline
         var outcomings = Set<Node>()
+
+        @usableFromInline
         var data: Data
 
         /// Create an empty node data.
+        @usableFromInline
         init(data: Data) {
             self.data = data
         }
     }
-
-    fileprivate enum _GraphKeys: CodingKey {
+    
+    internal enum _GraphKeys: CodingKey {
         case data
     }
 
-    fileprivate typealias _Data = [Node: _NodeData]
+    internal typealias _Data = [Node: _NodeData]
 
     /// Data of the graph
-    fileprivate var _data: [Node: _NodeData]
+    @usableFromInline
+    internal var _data: [Node: _NodeData]
 
     /// Creates an empty graph
+    @inlinable
     public init() {
         _data = [:]
     }
@@ -40,6 +49,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     ///
     /// - Parameter node: the node to lookup
     /// - Returns: true if the node exists, false otherwise
+    @inlinable
     public func contains(_ node: Node) -> Bool {
         return _data[node] != nil
     }
@@ -49,6 +59,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// - Parameters:
     ///   - node: the node to add
     ///   - data: data to be associated with the node
+    @inlinable
     public mutating func insert(_ node: Node, with data: Data) {
         if _data[node] == nil {
             _data[node] = _NodeData(data: data)
@@ -58,6 +69,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// Remove a node
     ///
     /// - Parameter node: the node to remove
+    @inlinable
     public mutating func remove(_ node: Node) {
         guard let nodeData = _data[node] else { return }
 
@@ -77,6 +89,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// - Parameters:
     ///   - source: where the connection starts
     ///   - target: where the connection ends
+    @inlinable
     public mutating func connect(from source: Node, to target: Node) {
         _data[source]?.outcomings.insert(target)
         _data[target]?.incomings.insert(source)
@@ -86,6 +99,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     ///
     /// - Parameter node: the node to query
     /// - Returns: a `NodeData` instance, if the node exists
+    @inlinable
     public func data(for node: Node) -> Data? {
         return _data[node]?.data
     }
@@ -94,6 +108,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     ///
     /// - Parameter node: the node to search incoming nodes for.
     /// - Returns: a optional set of the incoming nodes
+    @inlinable
     public func incomings(for node: Node) -> Set<Node>? {
         return _data[node]?.incomings
     }
@@ -102,6 +117,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     ///
     /// - Parameter node: the node to search outcoming nodes for.
     /// - Returns: a optional set of the outcoming nodes
+    @inlinable
     public func outcomings(for node: Node) -> Set<Node>? {
         return _data[node]?.outcomings
     }
@@ -109,6 +125,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// Get or set the associated data with the node
     ///
     /// - Parameter node: the associated node
+    @inlinable
     public subscript(node: Node) -> Data? {
         get { return _data[node]?.data }
         set {
@@ -126,18 +143,21 @@ public struct Graph<Node: Hashable, Data>: Sequence {
         /// Element is the type of the nodes
         public typealias Element = (node: Node, data: Data)
         /// The iterator to the node storage type's iterator
-        fileprivate var _iter: Dictionary<Node, _NodeData>.Iterator
+        @usableFromInline
+        internal var _iter: Dictionary<Node, _NodeData>.Iterator
 
         /// Create an iterator from an existing node storage type's iterator
         ///
         /// - Parameter iter: the source iterator
-        fileprivate init(from iter: Dictionary<Node, _NodeData>.Iterator) {
+        @usableFromInline
+        internal init(from iter: Dictionary<Node, _NodeData>.Iterator) {
             _iter = iter
         }
 
         /// Go to the next node
         ///
         /// - Returns: a node if the iterator is not at the end, nil otherwise
+        @inlinable
         public mutating func next() -> Element? {
             if let element = _iter.next() {
                 return (node: element.key, data: element.value.data)
@@ -150,6 +170,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     /// Create an iterator
     ///
     /// - Returns: an iterator instance
+    @inlinable
     public func makeIterator() -> Iterator {
         return Iterator(from: _data.makeIterator())
     }

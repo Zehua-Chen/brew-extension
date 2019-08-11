@@ -99,9 +99,9 @@ final class BrewExtensionTests: XCTestCase {
     func testUserPackageUninstall() {
         var graph = Graph<String, FormulaeInfo>()
         // User packages
-        graph.insert("target", with: .init(isUserPackage: true, folder: ""))
-        graph.insert("0-1", with: .init(isUserPackage: true, folder: ""))
-        graph.insert("0-2", with: .init(isUserPackage: true, folder: ""))
+        graph.insert("target", with: .init(isUserPackage: true))
+        graph.insert("0-1", with: .init(isUserPackage: true))
+        graph.insert("0-2", with: .init(isUserPackage: true))
 
         graph.insert("1-0", with: .init())
         graph.insert("1-1", with: .init())
