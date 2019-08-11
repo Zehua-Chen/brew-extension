@@ -34,9 +34,9 @@ final class GraphTests: XCTestCase {
 
         graph.remove(1)
 
-        XCTAssertTrue(graph.incomings(at: 2)!.isEmpty)
-        XCTAssertTrue(graph.incomings(at: 3)!.isEmpty)
-        XCTAssertTrue(graph.outcomings(at: 3)!.isEmpty)
+        XCTAssertTrue(graph.incomings(for: 2)!.isEmpty)
+        XCTAssertTrue(graph.incomings(for: 3)!.isEmpty)
+        XCTAssertTrue(graph.outcomings(for: 3)!.isEmpty)
 
         XCTAssertFalse(graph.contains(1))
     }
@@ -54,13 +54,13 @@ final class GraphTests: XCTestCase {
         graph.connect(from: 0, to: 1)
         graph.connect(from: 0, to: 2)
 
-        let zeroInBound = graph.incomings(at: 0)
+        let zeroInBound = graph.incomings(for: 0)
 
         XCTAssertNotNil(zeroInBound)
         XCTAssertTrue(zeroInBound!.contains(1))
         XCTAssertTrue(zeroInBound!.contains(2))
 
-        let zeroOutBound = graph.incomings(at: 0)
+        let zeroOutBound = graph.incomings(for: 0)
 
         XCTAssertNotNil(zeroOutBound)
         XCTAssertTrue(zeroOutBound!.contains(1))

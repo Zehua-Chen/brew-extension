@@ -94,7 +94,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     ///
     /// - Parameter node: the node to search incoming nodes for.
     /// - Returns: a optional set of the incoming nodes
-    public func incomings(at node: Node) -> Set<Node>? {
+    public func incomings(for node: Node) -> Set<Node>? {
         return _data[node]?.incomings
     }
 
@@ -102,7 +102,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
     ///
     /// - Parameter node: the node to search outcoming nodes for.
     /// - Returns: a optional set of the outcoming nodes
-    public func outcomings(at node: Node) -> Set<Node>? {
+    public func outcomings(for node: Node) -> Set<Node>? {
         return _data[node]?.outcomings
     }
 

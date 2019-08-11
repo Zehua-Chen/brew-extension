@@ -10,4 +10,9 @@ public struct FormulaeInfo: Encodable, Decodable {
     var folder = ""
     
     public init() {}
+    
+    public init(isUserPackage: Bool, folder: String) {
+        self.isUserPackage = isUserPackage
+        self.folder = folder
+    }
 }

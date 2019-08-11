@@ -3,13 +3,15 @@ import XCTest
 
 final class BrewExtensionTests: XCTestCase {
 
+    // MARK: Uninstall Without User Package
+
     func testUninstallSimple() {
         var graph = Graph<String, FormulaeInfo>()
 
-        graph.insert("target", with: FormulaeInfo())
-        graph.insert("0-1", with: FormulaeInfo())
-        graph.insert("1-1", with: FormulaeInfo())
-        graph.insert("1-2", with: FormulaeInfo())
+        graph.insert("target", with: .init())
+        graph.insert("0-1", with: .init())
+        graph.insert("1-1", with: .init())
+        graph.insert("1-2", with: .init())
 
         graph.connect(from: "target", to: "1-1")
         graph.connect(from: "target", to: "1-2")
@@ -18,10 +20,8 @@ final class BrewExtensionTests: XCTestCase {
         let brewExt = BrewExtension()
         brewExt.formulaes = graph
 
-        brewExt.uninstall(formulae: "target")
-        let names = Set(brewExt.uninstalls)
+        let names = Set(brewExt.findFormulaesToUninstall(for: "target"))
 
-        XCTAssertEqual(brewExt.uninstalls.count, 2)
         XCTAssertEqual(names.count, 2)
 
         XCTAssertTrue(names.contains("1-1"))
@@ -31,11 +31,11 @@ final class BrewExtensionTests: XCTestCase {
     func testUninstallComplex() {
         var graph = Graph<String, FormulaeInfo>()
 
-        graph.insert("target", with: FormulaeInfo())
-        graph.insert("0-1", with: FormulaeInfo())
-        graph.insert("1-0", with: FormulaeInfo())
-        graph.insert("1-1", with: FormulaeInfo())
-        graph.insert("1-2", with: FormulaeInfo())
+        graph.insert("target", with: .init())
+        graph.insert("0-1", with: .init())
+        graph.insert("1-0", with: .init())
+        graph.insert("1-1", with: .init())
+        graph.insert("1-2", with: .init())
 
         graph.connect(from: "target", to: "1-0")
         graph.connect(from: "target", to: "1-1")
@@ -47,10 +47,8 @@ final class BrewExtensionTests: XCTestCase {
         let brewExt = BrewExtension()
         brewExt.formulaes = graph
 
-        brewExt.uninstall(formulae: "target")
-        let names = Set(brewExt.uninstalls)
+        let names = Set(brewExt.findFormulaesToUninstall(for: "target"))
 
-        XCTAssertEqual(brewExt.uninstalls.count, 3)
         XCTAssertEqual(names.count, 3)
 
         XCTAssertTrue(names.contains("target"))
@@ -61,14 +59,14 @@ final class BrewExtensionTests: XCTestCase {
     func testUninstallMultiDepth() {
         var graph = Graph<String, FormulaeInfo>()
 
-        graph.insert("target", with: FormulaeInfo())
-        graph.insert("0-1", with: FormulaeInfo())
-        graph.insert("1-0", with: FormulaeInfo())
-        graph.insert("1-1", with: FormulaeInfo())
-        graph.insert("1-2", with: FormulaeInfo())
-        graph.insert("2-0", with: FormulaeInfo())
-        graph.insert("2-1", with: FormulaeInfo())
-        graph.insert("3-0", with: FormulaeInfo())
+        graph.insert("target", with: .init())
+        graph.insert("0-1", with: .init())
+        graph.insert("1-0", with: .init())
+        graph.insert("1-1", with: .init())
+        graph.insert("1-2", with: .init())
+        graph.insert("2-0", with: .init())
+        graph.insert("2-1", with: .init())
+        graph.insert("3-0", with: .init())
 
         graph.connect(from: "target", to: "1-0")
         graph.connect(from: "target", to: "1-1")
@@ -84,10 +82,8 @@ final class BrewExtensionTests: XCTestCase {
         let brewExt = BrewExtension()
         brewExt.formulaes = graph
 
-        brewExt.uninstall(formulae: "target")
-        let names = Set(brewExt.uninstalls)
+        let names = Set(brewExt.findFormulaesToUninstall(for: "target"))
 
-        XCTAssertEqual(brewExt.uninstalls.count, 6)
         XCTAssertEqual(names.count, 6)
 
         XCTAssertTrue(names.contains("target"))
@@ -96,6 +92,48 @@ final class BrewExtensionTests: XCTestCase {
         XCTAssertTrue(names.contains("2-0"))
         XCTAssertTrue(names.contains("2-1"))
         XCTAssertTrue(names.contains("3-0"))
+    }
+
+    // MARK: Uninstall With User Package
+
+    func testUserPackageUninstall() {
+        var graph = Graph<String, FormulaeInfo>()
+        // User packages
+        graph.insert("target", with: .init(isUserPackage: true, folder: ""))
+        graph.insert("0-1", with: .init(isUserPackage: true, folder: ""))
+        graph.insert("0-2", with: .init(isUserPackage: true, folder: ""))
+
+        graph.insert("1-0", with: .init())
+        graph.insert("1-1", with: .init())
+        graph.insert("1-2", with: .init())
+        graph.insert("1-3", with: .init())
+
+        graph.insert("2-0", with: .init())
+        graph.insert("2-1", with: .init())
+
+        graph.connect(from: "0-1", to: "1-0")
+        graph.connect(from: "target", to: "1-1")
+        graph.connect(from: "target", to: "1-2")
+        graph.connect(from: "0-2", to: "1-3")
+        graph.connect(from: "1-1", to: "0-1")
+
+        graph.connect(from: "1-2", to: "0-2")
+        graph.connect(from: "1-2", to: "2-0")
+
+        graph.connect(from: "1-3", to: "2-0")
+        graph.connect(from: "1-3", to: "2-1")
+
+        graph.connect(from: "2-0", to: "1-0")
+
+        let brewExt = BrewExtension()
+        brewExt.formulaes = graph
+
+        let names = brewExt.findFormulaesToUninstall(for: "target")
+
+        XCTAssertEqual(names.count, 3)
+        XCTAssertTrue(names.contains("target"))
+        XCTAssertTrue(names.contains("1-1"))
+        XCTAssertTrue(names.contains("1-2"))
     }
 }
 

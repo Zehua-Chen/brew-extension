@@ -50,9 +50,7 @@ let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
     logger.notice("database at \(dataPath)")
 
     try! brewExt.load(from: db)
-    brewExt.uninstallFormulae(context.unnamedParams[0] as! String)
-
-    let uninstalls = brewExt.uninstalls
+    let uninstalls = brewExt.findFormulaesToUninstall(for: context.unnamedParams[0] as! String)
 
     logger.critical("packages to be uninstalled \(uninstalls)")
 
@@ -65,7 +63,7 @@ let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
     if yes {
         for uninstall in uninstalls {
             logger.info("uninstalling \(uninstall)")
-            try! brewExt.brew.uninstall(formulae: uninstall)
+//            try! brewExt.brew.uninstall(formulae: uninstall)
         }
     }
 }
