@@ -7,10 +7,10 @@
 
 public struct FormulaeInfo: Encodable, Decodable {
     var isUserPackage: Bool
-    var folder: String
+    var labels: Set<String>
 
-    public init(isUserPackage: Bool = false, folder: String = "") {
+    public init(isUserPackage: Bool = false, labels: [String] = .init()) {
         self.isUserPackage = isUserPackage
-        self.folder = folder
+        self.labels = Set(labels)
     }
 }

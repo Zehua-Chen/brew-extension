@@ -23,12 +23,13 @@ let sync = try! app.addPath(["brew-extension", "sync"]) { (context) in
 
     logger.info("connecting to database")
 
-    var db = JsonDataBase.createOrLoad(from: dataPath)
+    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
+    brewExt.dataSource = dataSource
     logger.notice("database at \(dataPath)")
 
     do {
         logger.info("fetching data from homebrew")
-        try brewExt.sync(into: &db)
+        try brewExt.sync()
         logger.info("saving to database")
     } catch {
         print(error)
@@ -46,10 +47,11 @@ let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
 
     logger.info("connecting to database")
 
-    let db = JsonDataBase.createOrLoad(from: dataPath)
+    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
+    brewExt.dataSource = dataSource
     logger.notice("database at \(dataPath)")
 
-    try! brewExt.load(from: db)
+    try! brewExt.load()
     let uninstalls = brewExt.findFormulaesToUninstall(for: context.unnamedParams[0] as! String)
 
     logger.critical("packages to be uninstalled \(uninstalls)")

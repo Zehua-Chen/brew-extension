@@ -54,7 +54,7 @@ public struct Brew {
         return try decoder.decode(Array<FormulaeInfo>.self, from: output)
     }
 
-    public func uninstall(formulae name: String) throws {
+    public func uninstallFormulae(_ name: String) throws {
         let _: String = try _run(args: ["uninstall", name])
     }
 
