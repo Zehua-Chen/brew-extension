@@ -9,15 +9,6 @@ import BrewExtension
 import Foundation
 
 class JsonDataSource: BrewExtensionDataSource {
-    func removeFormulae(_ formulae: String) throws {
-    }
-
-    func removeLabel(_ label: String) throws {
-    }
-
-    func labelFormulae(_ formulae: String, as labels: String) throws {
-    }
-
 
     static func createOrLoad(from path: String) -> JsonDataSource {
         let url = URL(fileURLWithPath: path, isDirectory: true)
@@ -33,7 +24,21 @@ class JsonDataSource: BrewExtensionDataSource {
     /// URL where the data base is stored
     var url: URL
     var formulaesURL: URL
-    var foldersURL: URL
+    var labelsURL: URL
+
+    var formulaes: BrewExtension.Formulaes = .init()
+
+    var labels: BrewExtension.Labels = .init()
+
+    func flush() throws {
+        try _saveFormulaes()
+        try _saveLabels()
+    }
+
+    func load() throws {
+        try _loadFormulaes()
+        try _loadLabels()
+    }
 
     /// Initialize a json data base
     ///
@@ -42,37 +47,40 @@ class JsonDataSource: BrewExtensionDataSource {
     init(url: URL) {
         self.url = url
         self.formulaesURL = self.url.appendingPathComponent("formulaes.json")
-        self.foldersURL = self.url.appendingPathComponent("folders.json")
+        self.labelsURL = self.url.appendingPathComponent("labels.json")
     }
 
-    func saveFormulaes(_ info: BrewExtension.Formulaes) throws {
+    fileprivate func _saveFormulaes() throws {
         let encoder = JSONEncoder()
-        let data = try encoder.encode(info)
+        let data = try encoder.encode(self.formulaes)
+#if DEBUG
+        encoder.outputFormatting = .prettyPrinted
+#endif
 
         try _writeData(data, url: self.formulaesURL)
     }
 
-    func saveLabels(_ folders: BrewExtension.Labels) throws {
+    fileprivate func _saveLabels() throws {
         let encoder = JSONEncoder()
-        let data = try encoder.encode(folders)
+        let data = try encoder.encode(self.labels)
 
-        try _writeData(data, url: self.foldersURL)
+        try _writeData(data, url: self.labelsURL)
     }
 
-    func loadFormulaes() throws -> BrewExtension.Formulaes {
+    fileprivate func _loadFormulaes() throws {
         let decoder = JSONDecoder()
         let data = try Data(contentsOf: self.formulaesURL)
         let decoded = try decoder.decode(BrewExtension.Formulaes.self, from: data)
 
-        return decoded
+        self.formulaes = decoded
     }
 
-    func loadLabels() throws -> BrewExtension.Labels {
+    fileprivate func _loadLabels() throws {
         let decoder = JSONDecoder()
-        let data = try Data(contentsOf: self.formulaesURL)
+        let data = try Data(contentsOf: self.labelsURL)
         let decoded = try decoder.decode(BrewExtension.Labels.self, from: data)
 
-        return decoded
+        self.labels = decoded
     }
 
     fileprivate func _writeData(_ data: Data, url: URL) throws {

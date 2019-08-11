@@ -8,26 +8,9 @@
 public protocol BrewExtensionDataSource: AnyObject {
     
     // MARK: Formulaes
+    var formulaes: BrewExtension.Formulaes { get set }
+    var labels: BrewExtension.Labels { get set }
 
-    /// Save formulaes
-    ///
-    /// - Parameter formulaes: the formulaes to save
-    /// - Throws:
-    func saveFormulaes(_ formulaes: BrewExtension.Formulaes) throws
-
-    /// Load formulaes
-    ///
-    /// - Returns: loaded formulaes, if no existing info exist, returns empty
-    /// graph
-    /// - Throws:
-    func loadFormulaes() throws -> BrewExtension.Formulaes
-
-    func removeFormulae(_ formulae: String) throws
-
-    // MARK: Labels
-
-    func removeLabel(_ label: String) throws
-    func labelFormulae(_ formulae: String, as labels: String) throws
-    func saveLabels(_ labels: BrewExtension.Labels) throws
-    func loadLabels() throws -> BrewExtension.Labels
+    func flush() throws
+    func load() throws
 }

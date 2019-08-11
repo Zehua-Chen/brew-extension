@@ -1,20 +1,30 @@
 # Brew Extension
 
+All commands contain the following named parameters
+- `--path`: the path where cached information is stored; default is `~/.brew-extension`
+
 ## Commands
 
-````
+```
 brew-extension sync
-````
+```
 
-### Parameters
+### Uninstallation
 
-- `--path`: the path to which information is stored; default is `~/.brew-extension`
-
-````
+```
 brew-extension uninstall <name>
-````
+```
 
-### Parameters
+- `--yes`: whether to authroize uninstall; default is false
 
-- `--path`: the path where cached information is stored; default is `~/.brew-extension`
-- `-y`: whether to authroize uninstall; default is false
+### Label
+
+```
+brew-extension label
+```
+
+- `--remove`: will remove the label when set to `true`, default is `false`
+
+```
+brew-extension remove label
+```

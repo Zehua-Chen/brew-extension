@@ -1,6 +1,19 @@
 import XCTest
 @testable import BrewExtension
 
+fileprivate class SimpleDataSource: BrewExtensionDataSource {
+    var formulaes: BrewExtension.Formulaes
+    var labels: BrewExtension.Labels
+
+    init(formulaes: BrewExtension.Formulaes = .init(), labels: BrewExtension.Labels = .init()) {
+        self.formulaes = formulaes
+        self.labels = labels
+    }
+
+    func flush() throws {}
+    func load() throws {}
+}
+
 final class BrewExtensionTests: XCTestCase {
 
     // MARK: Uninstall Without User Package
@@ -18,7 +31,8 @@ final class BrewExtensionTests: XCTestCase {
         graph.connect(from: "0-1", to: "1-2")
 
         let brewExt = BrewExtension()
-        brewExt.formulaes = graph
+        let dataSource = SimpleDataSource(formulaes: graph)
+        brewExt.dataSource = dataSource
 
         let names = Set(brewExt.findFormulaesToUninstall(for: "target"))
 
@@ -45,7 +59,8 @@ final class BrewExtensionTests: XCTestCase {
         graph.connect(from: "1-0", to: "1-1")
 
         let brewExt = BrewExtension()
-        brewExt.formulaes = graph
+        let dataSource = SimpleDataSource(formulaes: graph)
+        brewExt.dataSource = dataSource
 
         let names = Set(brewExt.findFormulaesToUninstall(for: "target"))
 
@@ -80,7 +95,8 @@ final class BrewExtensionTests: XCTestCase {
         graph.connect(from: "2-1", to: "3-0")
 
         let brewExt = BrewExtension()
-        brewExt.formulaes = graph
+        let dataSource = SimpleDataSource(formulaes: graph)
+        brewExt.dataSource = dataSource
 
         let names = Set(brewExt.findFormulaesToUninstall(for: "target"))
 
@@ -126,7 +142,8 @@ final class BrewExtensionTests: XCTestCase {
         graph.connect(from: "2-0", to: "1-0")
 
         let brewExt = BrewExtension()
-        brewExt.formulaes = graph
+        let dataSource = SimpleDataSource(formulaes: graph)
+        brewExt.dataSource = dataSource
 
         let names = brewExt.findFormulaesToUninstall(for: "target")
 

@@ -9,54 +9,38 @@ import Brew
 import BrewExtension
 import SwiftArgParse
 import Foundation
-import Logging
 
 var app = CommandLineApplication(name: "brew-extension")
-let dataPath = "\(NSHomeDirectory())/.brew-extension"
+let defaultdDataPath = "\(NSHomeDirectory())/.brew-extension"
 
 // MARK: brew-extension sync
 
 let sync = try! app.addPath(["brew-extension", "sync"]) { (context) in
     let brewExt = BrewExtension()
-    let logger = Logger(label: "brew-extension")
     let dataPath = context.namedParams["--path"] as! String
-
-    logger.info("connecting to database")
 
     let dataSource = JsonDataSource.createOrLoad(from: dataPath)
     brewExt.dataSource = dataSource
-    logger.notice("database at \(dataPath)")
 
-    do {
-        logger.info("fetching data from homebrew")
-        try brewExt.sync()
-        logger.info("saving to database")
-    } catch {
-        print(error)
-    }
+    try! brewExt.sync()
 }
 
-sync.registerNamedParam("--path", defaultValue: dataPath)
+sync.registerNamedParam("--path", defaultValue: defaultdDataPath)
 
 // MARK: brew-extension uninstall
 
 let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
     let brewExt = BrewExtension()
-    let logger = Logger(label: "brew-extension")
     let dataPath = context.namedParams["--path"] as! String
-
-    logger.info("connecting to database")
+    let formulaeToUninstall = context.unnamedParams[0] as! String
 
     let dataSource = JsonDataSource.createOrLoad(from: dataPath)
     brewExt.dataSource = dataSource
-    logger.notice("database at \(dataPath)")
 
     try! brewExt.load()
-    let uninstalls = brewExt.findFormulaesToUninstall(for: context.unnamedParams[0] as! String)
+    let uninstalls = brewExt.findFormulaesToUninstall(for: formulaeToUninstall)
 
-    logger.critical("packages to be uninstalled \(uninstalls)")
-
-    var yes = context.namedParams["-y"] as! Bool
+    var yes = context.namedParams["--yes"] as! Bool
 
     if !yes {
         yes = Input<Bool>.read(prompt: "uninstall? (y/f)", defaultValue: false)
@@ -64,15 +48,82 @@ let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
 
     if yes {
         for uninstall in uninstalls {
-            logger.info("uninstalling \(uninstall)")
-//            try! brewExt.brew.uninstall(formulae: uninstall)
+            try! brewExt.uninstallFormulae(uninstall)
         }
     }
 }
 
-uninstall.registerNamedParam("-y", defaultValue: false)
-uninstall.registerNamedParam("--path", defaultValue: dataPath)
+uninstall.registerNamedParam("--yes", defaultValue: false)
+uninstall.registerNamedParam("--path", defaultValue: defaultdDataPath)
 uninstall.addUnnamedParam(String.self)
+
+// MARK: brew-extension list
+
+let list = try! app.addPath(["brew-extension", "list"]) { (context) in
+    let dataPath = context.namedParams["--path"] as! String
+    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
+
+    let brewExt = BrewExtension()
+    brewExt.dataSource = dataSource
+
+    let label = context.namedParams["--label"] as! String
+    if !label.isEmpty {
+        for formulae in brewExt.formulaes(under: label) {
+            print(formulae)
+        }
+
+        return
+    }
+
+    for formulae in brewExt.formulaes() {
+        print(formulae)
+    }
+}
+
+list.registerNamedParam("--path", defaultValue: defaultdDataPath)
+list.registerNamedParam("--label", defaultValue: "")
+
+// MARK: brew-extension label
+
+let label = try! app.addPath(["brew-extension", "label"]) { (context) in
+    let formulae = context.unnamedParams[0] as! String
+    let label = context.unnamedParams[1] as! String
+    let remove = context.namedParams["--remove"] as! Bool
+
+    let dataPath = context.namedParams["--path"] as! String
+    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
+
+    let brewExt = BrewExtension()
+    brewExt.dataSource = dataSource
+
+    if remove {
+        try! brewExt.removeLabel(label, from: formulae)
+    } else {
+        try! brewExt.labelFormulae(formulae, as: label)
+    }
+}
+
+label.addUnnamedParam(String.self)
+label.addUnnamedParam(String.self)
+
+label.registerNamedParam("--path", defaultValue: defaultdDataPath)
+label.registerNamedParam("--remove", defaultValue: false)
+
+// MARK: brew-extension remove label
+
+let removeLabel = try! app.addPath(["brew-extension", "remove", "label"]) { (context) in
+    let label = context.unnamedParams[0] as! String
+    let dataPath = context.namedParams["--path"] as! String
+
+    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
+    let brewExt = BrewExtension()
+    brewExt.dataSource = dataSource
+
+    try! brewExt.removeLabel(label)
+}
+
+removeLabel.addUnnamedParam(String.self)
+removeLabel.registerNamedParam("--path", defaultValue: defaultdDataPath)
 
 do {
     try app.run()

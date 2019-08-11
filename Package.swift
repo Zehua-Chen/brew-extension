@@ -11,6 +11,9 @@ let package = Package(
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
+            name: "Brew",
+            targets: ["Brew"]),
+        .library(
             name: "BrewExtension",
             targets: ["BrewExtension"]),
     	.executable(
@@ -21,7 +24,6 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "https://github.com/Zehua-Chen/swift-argparse", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0")
 //        .package(url: "https://github.com/stephencelis/SQLite.swift", from: "0.12.2")
     ],
     targets: [
@@ -35,7 +37,7 @@ let package = Package(
             dependencies: []),
     	.target(
     	    name: "brew-extension",
-    	    dependencies: ["BrewExtension", "SwiftArgParse", "Logging"]),
+    	    dependencies: ["BrewExtension", "SwiftArgParse"]),
         .testTarget(
             name: "BrewExtensionTests",
             dependencies: ["BrewExtension"]),
