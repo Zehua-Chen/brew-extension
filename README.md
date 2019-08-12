@@ -1,6 +1,9 @@
 # Brew Extension
 
+## Features
 
+- Smart uninstallation
+- Group formulaes using labels
 
 ## Commands
 
