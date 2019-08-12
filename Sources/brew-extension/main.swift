@@ -33,21 +33,28 @@ let list = try! app.addPath(["brew-extension", "list"]) { (context) in
     let dataBase = JsonDataBase.createOrLoad(from: dataPath)
     brewExt.dataBase = dataBase
 
-    if let label = context.namedParams["--label"] as? String {
-        for formulae in brewExt.formulaes(under: label) {
-            print(formulae)
-        }
+    var formulaes = brewExt.formulaes()
 
-        return
+    if let label = context.namedParams["--label"] as? String {
+        formulaes = formulaes.filter {
+            return brewExt.formulaeGraph[$0]!.labels.contains(label)
+        }
     }
 
-    for formulae in brewExt.formulaes() {
+    if context.namedParams["--protected"] as! Bool {
+        formulaes = formulaes.filter {
+            return brewExt.formulaeGraph[$0]!.isProtected == true
+        }
+    }
+
+    for formulae in formulaes {
         print(formulae)
     }
 }
 
 list.registerNamedParam("--path", defaultValue: defaultdDataPath)
 list.registerNamedParam("--label", type: String.self)
+list.registerNamedParam("--protected", defaultValue: false)
 
 // MARK: brew-extension list labels
 
@@ -156,6 +163,36 @@ let removeFormulae = try! app.addPath(["brew-extension", "remove"]) { (context) 
 removeFormulae.registerNamedParam("--yes", defaultValue: false)
 removeFormulae.registerNamedParam("--path", defaultValue: defaultdDataPath)
 removeFormulae.addUnnamedParam(String.self)
+
+// MARK: brew-extension protect
+
+let protect = try! app.addPath(["brew-extension", "protect"]) { (context) in
+    let dataPath = context.namedParams["--path"] as! String
+    let formulaeToProtect = context.unnamedParams[0] as! String
+
+    let dataBase = JsonDataBase.createOrLoad(from: dataPath)
+    brewExt.dataBase = dataBase
+
+    brewExt.protectFormulae(formulaeToProtect)
+}
+
+protect.addUnnamedParam(String.self)
+protect.registerNamedParam("--path", defaultValue: defaultdDataPath)
+
+// MARK: brew-extension unprotect
+
+let unprotect = try! app.addPath(["brew-extension", "unprotect"]) { (context) in
+    let dataPath = context.namedParams["--path"] as! String
+    let formulaeToProtect = context.unnamedParams[0] as! String
+
+    let dataBase = JsonDataBase.createOrLoad(from: dataPath)
+    brewExt.dataBase = dataBase
+
+    brewExt.unprotectFormulae(formulaeToProtect)
+}
+
+unprotect.addUnnamedParam(String.self)
+unprotect.registerNamedParam("--path", defaultValue: defaultdDataPath)
 
 do {
     try app.run()

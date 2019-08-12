@@ -175,6 +175,22 @@ public final class BrewExtension {
         try self.brew.uninstallFormulae(formulae)
     }
 
+    public func protectFormulae(_ formulae: String) {
+        guard self.formulaeGraph.contains(formulae) else { return }
+        self.formulaeGraph[formulae]!.isProtected = true
+        self.dataBase?.protectFormulae(formulae)
+
+        self.dataBase?.write()
+    }
+
+    public func unprotectFormulae(_ formulae: String) {
+        guard self.formulaeGraph.contains(formulae) else { return }
+        self.formulaeGraph[formulae]!.isProtected = false
+        self.dataBase?.unprotectFormulae(formulae)
+
+        self.dataBase?.write()
+    }
+
     // MARK: List
 
     /// Get an array of formulaes
@@ -188,6 +204,13 @@ public final class BrewExtension {
         }
 
         return list
+    }
+
+    /// Get an array of protected formulaes
+    public func protectedFormulaes() -> [String] {
+        return self.formulaes().filter {
+            return self.formulaeGraph[$0]!.isProtected
+        }
     }
 
     /// Get a set of formulaes under a label

@@ -1,12 +1,31 @@
 # Brew Extension
 
-All commands contain the following named parameters
-- `--path`: the path where cached information is stored; default is `~/.brew-extension`
+
 
 ## Commands
 
+All commands contain the following named parameters
+- `--path`: the path where cached information is stored; default is `~/.brew-extension`
+
+## Homebrew Communication
+
 ```
 brew-extension sync
+```
+
+Sync information with homebrew
+
+## Protect
+
+When a formulae is protected, it will not be considered to be removed as a dependency when
+a formulae is removed
+
+```
+brew-extension protect <formulae>
+```
+
+```
+brew-extension unprotect <formulae>
 ```
 
 ## List
@@ -17,7 +36,8 @@ brew-extension list
 
 List all the formulaes
 
-- `--label`: a filter used to filter the list of formulaes
+- `--label`: a string used to filter the list of formulaes
+- `--protected`: whether to display only protected formulaes, default to false
 
 ```
 brew-extension list labels
