@@ -20,11 +20,15 @@ brew-extension uninstall <name>
 ### Label
 
 ```
-brew-extension label
+brew-extension label <formulae> <label>
 ```
 
 - `--remove`: will remove the label when set to `true`, default is `false`
 
 ```
 brew-extension remove label
+```
+
+```
+brew-extension remove label <label>
 ```
