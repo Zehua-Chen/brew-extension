@@ -10,8 +10,15 @@ import Foundation
 
 public final class BrewExtension {
 
-    public internal(set) var formulaes = Graph<String, FormulaeInfo>()
+    public typealias Formulaes = Graph<String, FormulaeInfo>
+    public typealias Labels = [String: Set<String>]
+
     public internal(set) var brew: Brew
+    public weak var dataSource: BrewExtensionDataSource? {
+        didSet {
+            try! self.dataSource?.load()
+        }
+    }
 
     public init(
         url: URL = URL(fileURLWithPath: "/usr/local/Homebrew/bin/brew")
@@ -19,18 +26,22 @@ public final class BrewExtension {
         self.brew = Brew(url: url)
     }
 
+    // MARK: Sync with data base
+
     /// Sync formulae info with homebrew
     ///
     /// - Throws:
-    public func sync<DB: DataBase>(into db: inout DB) throws {
+    public func sync() throws {
+        guard let dataSource = self.dataSource else { return }
+
         let list = try self.brew.list()
         let rawInfos = try self.brew.info(of: list)
 
-        self.formulaes = .init()
+        var formulaes = Formulaes()
 
         for info in rawInfos {
             // TODO: init formulae info
-            self.formulaes.insert(info.name, with: FormulaeInfo())
+            formulaes.insert(info.name, with: FormulaeInfo())
         }
 
         // build connections
@@ -41,39 +52,34 @@ public final class BrewExtension {
             for dep in info.deps {
                 // Dependency relation is only constructed between
                 // installed formulaes
-                if self.formulaes.contains(dep) {
-                    self.formulaes.connect(from: name, to: dep)
+                if formulaes.contains(dep) {
+                    formulaes.connect(from: name, to: dep)
                 }
             }
         }
 
         // Merge formulae infos
 
-        let existingFormulaes = try db.loadFormulaes()
-
-        for existingFormulae in existingFormulaes {
-            self.formulaes[existingFormulae.node] = existingFormulae.data
+        for existingFormulae in dataSource.formulaes {
+            formulaes[existingFormulae.node] = existingFormulae.data
         }
 
-        try db.saveFormulaes(self.formulaes)
+        dataSource.formulaes = formulaes
+        try dataSource.flush()
     }
 
-    /// Sync the information of the brew extension into a database
-    ///
-    /// - Parameter db: the data base to write into
-    public func flush<DB: DataBase>(into db: inout DB) throws {
-        try db.saveFormulaes(self.formulaes)
+    public func load() throws {
+        try self.dataSource?.load()
     }
 
-    public func load<DB: DataBase>(from db: DB) throws {
-        self.formulaes = try db.loadFormulaes()
-    }
+    // MARK: Uninstall
 
     public func findFormulaesToUninstall(for formulae: String) -> [String] {
-        guard self.formulaes.contains(formulae) else { return [] }
+        guard let formulaes = self.dataSource?.formulaes else { return [] }
+        guard formulaes.contains(formulae) else { return [] }
 
         var uninstalls = [String]()
-        var graph = self.formulaes
+        var graph = formulaes
         var set = Set<String>()
         set.insert(formulae)
 
@@ -98,5 +104,83 @@ public final class BrewExtension {
         }
 
         return uninstalls
+    }
+
+    public func uninstallFormulae(_ formulae: String) throws {
+        guard let dataSource = self.dataSource else { return }
+
+        let formulaes = dataSource.formulaes
+        guard formulaes.contains(formulae) else { return }
+        
+        let data = formulaes.data(for: formulae)!
+
+        for label in data.labels {
+            dataSource.labels[label]!.remove(formulae)
+        }
+
+        dataSource.formulaes.remove(formulae)
+        try dataSource.flush()
+
+        try self.brew.uninstallFormulae(formulae)
+    }
+
+    // MARK: List
+
+    public func formulaes() -> [String] {
+        guard let dataSource = self.dataSource else { return [] }
+
+        var list = [String]()
+
+        for formulae in dataSource.formulaes {
+            list.append(formulae.node)
+        }
+
+        return list
+    }
+
+    public func formulaes(under label: String) -> [String] {
+        guard let dataSource = self.dataSource else { return [] }
+        guard let formulaes = dataSource.labels[label] else { return [] }
+
+        return .init(formulaes)
+    }
+
+    // MARK: Label
+
+    public func removeLabel(_ label: String) throws {
+        guard let dataSource = self.dataSource else { return }
+        guard let formulaesInLabel = dataSource.labels[label] else { return }
+
+        for formulae in formulaesInLabel {
+            dataSource.formulaes[formulae]!.labels.remove(label)
+        }
+
+        dataSource.labels.removeValue(forKey: label)
+        try dataSource.flush()
+    }
+
+    public func labelFormulae(
+        _ formulae: String,
+        as label: String) throws {
+
+        guard let dataSource = self.dataSource else { return }
+
+        if dataSource.labels[label] == nil {
+            dataSource.labels[label] = .init([formulae])
+        } else {
+            dataSource.labels[label]!.insert(formulae)
+        }
+
+        dataSource.formulaes[formulae]!.labels.insert(label)
+        try dataSource.flush()
+    }
+
+    public func removeLabel(_ label: String, from formulae: String) throws {
+        guard let dataSource = self.dataSource else { return }
+
+        dataSource.labels[label]?.remove(formulae)
+        dataSource.formulaes[formulae]?.labels.remove(label)
+
+        try dataSource.flush()
     }
 }
