@@ -19,8 +19,8 @@ let sync = try! app.addPath(["brew-extension", "sync"]) { (context) in
     let brewExt = BrewExtension()
     let dataPath = context.namedParams["--path"] as! String
 
-    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
-    brewExt.dataSource = dataSource
+    let dataBase = JsonDataBase.createOrLoad(from: dataPath)
+    brewExt.dataBase = dataBase
 
     try! brewExt.sync()
 }
@@ -34,10 +34,9 @@ let uninstall = try! app.addPath(["brew-extension", "uninstall"]) { (context) in
     let dataPath = context.namedParams["--path"] as! String
     let formulaeToUninstall = context.unnamedParams[0] as! String
 
-    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
-    brewExt.dataSource = dataSource
+    let dataBase = JsonDataBase.createOrLoad(from: dataPath)
+    brewExt.dataBase = dataBase
 
-    try! brewExt.load()
     let uninstalls = brewExt.findFormulaesToUninstall(for: formulaeToUninstall)
 
     var yes = context.namedParams["--yes"] as! Bool
@@ -61,10 +60,10 @@ uninstall.addUnnamedParam(String.self)
 
 let list = try! app.addPath(["brew-extension", "list"]) { (context) in
     let dataPath = context.namedParams["--path"] as! String
-    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
+    let dataBase = JsonDataBase.createOrLoad(from: dataPath)
 
     let brewExt = BrewExtension()
-    brewExt.dataSource = dataSource
+    brewExt.dataBase = dataBase
 
     let label = context.namedParams["--label"] as! String
     if !label.isEmpty {
@@ -91,10 +90,10 @@ let label = try! app.addPath(["brew-extension", "label"]) { (context) in
     let remove = context.namedParams["--remove"] as! Bool
 
     let dataPath = context.namedParams["--path"] as! String
-    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
+    let dataBase = JsonDataBase.createOrLoad(from: dataPath)
 
     let brewExt = BrewExtension()
-    brewExt.dataSource = dataSource
+    brewExt.dataBase = dataBase
 
     if remove {
         try! brewExt.removeLabel(label, from: formulae)
@@ -115,9 +114,9 @@ let removeLabel = try! app.addPath(["brew-extension", "remove", "label"]) { (con
     let label = context.unnamedParams[0] as! String
     let dataPath = context.namedParams["--path"] as! String
 
-    let dataSource = JsonDataSource.createOrLoad(from: dataPath)
+    let dataBase = JsonDataBase.createOrLoad(from: dataPath)
     let brewExt = BrewExtension()
-    brewExt.dataSource = dataSource
+    brewExt.dataBase = dataBase
 
     try! brewExt.removeLabel(label)
 }
