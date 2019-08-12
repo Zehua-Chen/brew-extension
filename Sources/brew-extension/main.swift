@@ -49,6 +49,20 @@ let list = try! app.addPath(["brew-extension", "list"]) { (context) in
 list.registerNamedParam("--path", defaultValue: defaultdDataPath)
 list.registerNamedParam("--label", type: String.self)
 
+// MARK: brew-extension list labels
+
+let listLabels = try! app.addPath(["brew-extension", "list", "labels"]) { (context) in
+    let dataPath = context.namedParams["--path"] as! String
+    let dataBase = JsonDataBase.createOrLoad(from: dataPath)
+    brewExt.dataBase = dataBase
+
+    for label in brewExt.labels() {
+        print(label)
+    }
+}
+
+listLabels.registerNamedParam("--path", defaultValue: defaultdDataPath)
+
 // MARK: brew-extension label
 
 let label = try! app.addPath(["brew-extension", "label"]) { (context) in
@@ -109,9 +123,9 @@ let removeCache = try! app.addPath(["brew-extension", "remove", "cache"]) { (con
 removeCache.addUnnamedParam(String.self)
 removeCache.registerNamedParam("--path", defaultValue: defaultdDataPath)
 
-// MARK: brew-extension remove formulae
+// MARK: brew-extension remove
 
-let removeFormulae = try! app.addPath(["brew-extension", "remove", "formulae"]) { (context) in
+let removeFormulae = try! app.addPath(["brew-extension", "remove"]) { (context) in
     let dataPath = context.namedParams["--path"] as! String
     let formulaeToUninstall = context.unnamedParams[0] as! String
 

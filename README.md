@@ -9,10 +9,26 @@ All commands contain the following named parameters
 brew-extension sync
 ```
 
+## List
+
+```
+brew-extension list 
+```
+
+List all the formulaes
+
+- `--label`: a filter used to filter the list of formulaes
+
+```
+brew-extension list labels
+```
+
+List all the labels
+
 ### Remove
 
 ```
-brew-extension remove formulae <formulae>
+brew-extension remove <formulae>
 ```
 
 Remove (uninstall) a formulae

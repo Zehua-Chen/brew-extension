@@ -198,6 +198,10 @@ public final class BrewExtension {
         return self.dataBase?.formulaes(under: label) ?? Set<String>()
     }
 
+    public func labels() -> [String] {
+        return self.dataBase?.labels() ?? []
+    }
+
     // MARK: Label
 
     /// Label a formulae
