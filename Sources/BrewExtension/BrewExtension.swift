@@ -15,7 +15,32 @@ public final class BrewExtension {
 
     public internal(set) var brew: Brew
     internal var _formulaes = Graph<String, FormulaeInfo>()
-    public weak var dataBase: BrewExtensionDataBase?
+
+    public weak var dataBase: BrewExtensionDataBase? {
+        didSet {
+            guard let db = self.dataBase else { return }
+
+            _formulaes = .init()
+
+            let formulaes = db.formulaes()
+
+            for formulae in formulaes {
+                let protected = db.protectsFormulae(formulae)
+                let labels = db.labels(of: formulae)
+                _formulaes.insert(formulae, with: .init(
+                    isProtected: protected,
+                    labels: labels))
+            }
+
+            for formulae in formulaes {
+                let outcomings = db.outcomingDependencies(for: formulae)
+
+                for outcoming in outcomings {
+                    _formulaes.connect(from: formulae, to: outcoming)
+                }
+            }
+        }
+    }
 
     public init(
         url: URL = URL(fileURLWithPath: "/usr/local/Homebrew/bin/brew")
@@ -27,10 +52,16 @@ public final class BrewExtension {
 
     /// Sync formulae info with homebrew
     ///
-    /// - Throws:
-    public func sync() throws {
+    /// - Parameter providedRawInfos: the raw info of home-brew used to sync
+    public func sync(using providedRawInfos: [Brew.FormulaeInfo]? = nil) throws {
         let list = try self.brew.list()
-        let rawInfos = try self.brew.info(of: list)
+        let rawInfos: [Brew.FormulaeInfo]
+
+        if providedRawInfos != nil {
+            rawInfos = providedRawInfos!
+        } else {
+            rawInfos = try self.brew.info(of: list)
+        }
 
         _formulaes = Formulaes()
 

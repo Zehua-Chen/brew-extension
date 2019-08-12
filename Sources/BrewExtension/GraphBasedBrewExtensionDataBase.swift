@@ -64,6 +64,7 @@ public extension GraphBasedBrewExtensionDataBase {
     }
 
     // MARK: Formulaes
+
     func containsFormulae(_ formulae: String) -> Bool {
         return self.formulaes.contains(formulae)
     }
@@ -74,6 +75,16 @@ public extension GraphBasedBrewExtensionDataBase {
 
     func removeFormulae(_ formulae: String) {
         self.formulaes.remove(formulae)
+    }
+
+    func formulaes() -> [String] {
+        var list = [String]()
+
+        for formulae in self.formulaes {
+            list.append(formulae.node)
+        }
+
+        return list
     }
 
     // MARK: Formulae Dependencies

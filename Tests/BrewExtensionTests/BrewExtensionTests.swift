@@ -1,7 +1,7 @@
 import XCTest
 @testable import BrewExtension
 
-fileprivate class SimpleDataSource: BrewExtensionDataSource {
+fileprivate class SimpleDataBase: GraphBasedBrewExtensionDataBase {
     var formulaes: BrewExtension.Formulaes
     var labels: BrewExtension.Labels
 
@@ -10,8 +10,7 @@ fileprivate class SimpleDataSource: BrewExtensionDataSource {
         self.labels = labels
     }
 
-    func flush() throws {}
-    func load() throws {}
+    func write() {}
 }
 
 final class BrewExtensionTests: XCTestCase {
@@ -31,8 +30,8 @@ final class BrewExtensionTests: XCTestCase {
         graph.connect(from: "0-1", to: "1-2")
 
         let brewExt = BrewExtension()
-        let dataSource = SimpleDataSource(formulaes: graph)
-        brewExt.dataSource = dataSource
+        let dataBase = SimpleDataBase(formulaes: graph)
+        brewExt.dataBase = dataBase
 
         let names = Set(brewExt.findFormulaesToUninstall(for: "target"))
 
@@ -59,8 +58,8 @@ final class BrewExtensionTests: XCTestCase {
         graph.connect(from: "1-0", to: "1-1")
 
         let brewExt = BrewExtension()
-        let dataSource = SimpleDataSource(formulaes: graph)
-        brewExt.dataSource = dataSource
+        let dataBase = SimpleDataBase(formulaes: graph)
+        brewExt.dataBase = dataBase
 
         let names = Set(brewExt.findFormulaesToUninstall(for: "target"))
 
@@ -95,8 +94,8 @@ final class BrewExtensionTests: XCTestCase {
         graph.connect(from: "2-1", to: "3-0")
 
         let brewExt = BrewExtension()
-        let dataSource = SimpleDataSource(formulaes: graph)
-        brewExt.dataSource = dataSource
+        let dataBase = SimpleDataBase(formulaes: graph)
+        brewExt.dataBase = dataBase
 
         let names = Set(brewExt.findFormulaesToUninstall(for: "target"))
 
@@ -115,9 +114,9 @@ final class BrewExtensionTests: XCTestCase {
     func testUserPackageUninstall() {
         var graph = Graph<String, FormulaeInfo>()
         // User packages
-        graph.insert("target", with: .init(isUserPackage: true))
-        graph.insert("0-1", with: .init(isUserPackage: true))
-        graph.insert("0-2", with: .init(isUserPackage: true))
+        graph.insert("target", with: .init(isProtected: true))
+        graph.insert("0-1", with: .init(isProtected: true))
+        graph.insert("0-2", with: .init(isProtected: true))
 
         graph.insert("1-0", with: .init())
         graph.insert("1-1", with: .init())
@@ -142,8 +141,8 @@ final class BrewExtensionTests: XCTestCase {
         graph.connect(from: "2-0", to: "1-0")
 
         let brewExt = BrewExtension()
-        let dataSource = SimpleDataSource(formulaes: graph)
-        brewExt.dataSource = dataSource
+        let dataBase = SimpleDataBase(formulaes: graph)
+        brewExt.dataBase = dataBase
 
         let names = brewExt.findFormulaesToUninstall(for: "target")
 

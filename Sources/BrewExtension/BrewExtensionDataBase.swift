@@ -86,6 +86,11 @@ public protocol BrewExtensionDataBase: AnyObject {
     /// - Parameter formulae: the formulae to remove
     func removeFormulae(_ formulae: String)
 
+    /// Get an array of formulaes (formulae names)
+    ///
+    /// - Returns: an array of formulaes
+    func formulaes() -> [String]
+
     // MARK: Formulae Dependencies
     func addDependency(from: String, to: String)
     func hasDependency(from formulae: String, to formulae: String) -> Bool
