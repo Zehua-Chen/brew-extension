@@ -19,6 +19,16 @@ public extension GraphBasedBrewExtensionDataBase {
         return data.labels
     }
 
+    func labels() -> [String] {
+        var list = [String]()
+
+        for node in self.labels {
+            list.append(node.key)
+        }
+
+        return list
+    }
+
     func removeLabel(_ label: String, from formulae: String) {
         self.labels[label]?.remove(formulae)
         self.formulaes[formulae]?.labels.remove(label)

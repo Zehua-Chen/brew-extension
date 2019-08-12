@@ -16,6 +16,11 @@ public protocol BrewExtensionDataBase: AnyObject {
     /// - Returns: name of the labels
     func labels(of formulae: String) -> Set<String>
 
+    /// Get an array of labels
+    ///
+    /// - Returns: get an array of labels
+    func labels() -> [String]
+
     /// Get formulaes under a label
     ///
     /// - Parameter label: the name of the label

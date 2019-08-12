@@ -47,6 +47,14 @@ class JsonDataBase: GraphBasedBrewExtensionDataBase {
         try! _saveLabels()
     }
 
+    /// Remove data base from disk
+    ///
+    /// after this method, the instance is invalidated
+    func remove() throws {
+        let manager = FileManager.default
+        try manager.removeItem(at: self.url)
+    }
+
     deinit {
         self.write()
     }
