@@ -72,14 +72,14 @@ class JsonDataBase: GraphBasedBrewExtensionDataBase {
         let decoder = JSONDecoder()
         guard let data = try? Data(contentsOf: self.formulaesURL) else { return }
 
-        self.formulaes = try decoder.decode(BrewExtension.Formulaes.self, from: data)
+        self.formulaes = try decoder.decode(Graph<String, FormulaeInfo>.self, from: data)
     }
 
     fileprivate func _loadLabels() throws {
         let decoder = JSONDecoder()
         guard let data = try? Data(contentsOf: self.labelsURL) else { return }
 
-        self.labels = try decoder.decode(BrewExtension.Labels.self, from: data)
+        self.labels = try decoder.decode([String: Set<String>].self, from: data)
     }
 
     fileprivate func _writeData(_ data: Data, url: URL) throws {

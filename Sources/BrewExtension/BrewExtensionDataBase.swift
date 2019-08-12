@@ -92,11 +92,36 @@ public protocol BrewExtensionDataBase: AnyObject {
     func formulaes() -> [String]
 
     // MARK: Formulae Dependencies
+
+
+    /// Add a dependency from a given node to a given node
+    ///
+    /// - Parameters:
+    ///   - from: the source node
+    ///   - to: the destinatino node
     func addDependency(from: String, to: String)
-    func hasDependency(from formulae: String, to formulae: String) -> Bool
+
+    /// Determine if a dependency exists
+    ///
+    /// - Parameters:
+    ///   - from: the source formulae
+    ///   - to: the destination formulae
+    func hasDependency(from: String, to: String) -> Bool
+
+    /// Get outcoming dependencies for a formulae
+    ///
+    /// - Parameter formulae: the formulae to get dependencies for
+    /// - Returns: a set of outcoming dependencies
     func outcomingDependencies(for formulae: String) -> Set<String>
+
+    /// Get incoming dependencies for a formulae
+    ///
+    /// - Parameter formulae: the formulae to get dependencies for
+    /// - Returns: a set of incoming dependencies
     func incomingDependencies(for formulae: String) -> Set<String>
 
     // MARK: Notifications
+
+    /// Write the data base to a permenant storage
     func write()
 }
