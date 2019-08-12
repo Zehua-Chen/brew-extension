@@ -9,13 +9,28 @@ All commands contain the following named parameters
 brew-extension sync
 ```
 
-### Uninstallation
+### Remove
 
 ```
-brew-extension uninstall <name>
+brew-extension remove formulae <formulae>
 ```
+
+Remove (uninstall) a formulae
 
 - `--yes`: whether to authroize uninstall; default is false
+
+```
+brew-extension remove label <label>
+```
+
+Remove a label
+
+```
+brew-extension remove cache
+```
+
+Delete all the caches. If this "path" is used, `brew-extension sync` must be used
+before any other "paths"
 
 ### Label
 
@@ -23,12 +38,10 @@ brew-extension uninstall <name>
 brew-extension label <formulae> <label>
 ```
 
-- `--remove`: will remove the label when set to `true`, default is `false`
+Give a formulae a label
 
 ```
-brew-extension remove label
+brew-extension unlabel <formulae> <label>
 ```
 
-```
-brew-extension remove label <label>
-```
+Remove a label from a formulae
