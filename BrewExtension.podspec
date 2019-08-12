@@ -10,7 +10,11 @@ Pod::Spec.new do |s|
   s.swift_version = '5.0'
   s.author = 'Zehua Chen'
   s.homepage = 'https://github.com/Zehua-Chen/brew-extension'
-  s.source = { :git => 'https://github.com/Zehua-Chen/brew-extension.git', :tag => s.version.to_s }
+  s.source = {
+    :git => 'https://github.com/Zehua-Chen/brew-extension.git',
+    # :tag => s.version.to_s
+    :branch => "cocoapods"
+  }
 
   s.subspec 'Brew' do |hb|
     hb.name = 'Brew'
