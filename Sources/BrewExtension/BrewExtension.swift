@@ -5,7 +5,10 @@
 //  Created by Zehua Chen on 5/20/19.
 //
 
-import Brew
+#if SWIFT_PACKAGE
+    import Brew
+#endif
+
 import Foundation
 
 public final class BrewExtension {
@@ -162,7 +165,7 @@ public final class BrewExtension {
     /// - Throws:
     public func uninstallFormulae(_ formulae: String) throws {
         guard self.formulaeGraph.contains(formulae) else { return }
-        
+
         let data = self.formulaeGraph.data(for: formulae)!
 
         for label in data.labels {
@@ -261,7 +264,7 @@ public final class BrewExtension {
     /// - Parameters:
     ///   - label: the label to remove
     ///   - formulae: a formulae where the label is removed
-    /// - Throws: 
+    /// - Throws:
     public func removeLabel(_ label: String, from formulae: String) throws {
         self.dataBase?.removeLabel(label, from: formulae)
         self.dataBase?.write()
