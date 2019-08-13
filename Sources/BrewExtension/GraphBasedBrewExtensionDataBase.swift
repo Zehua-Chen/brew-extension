@@ -39,7 +39,7 @@ public extension GraphBasedBrewExtensionDataBase {
         self.labels[label]?.insert(formulae)
     }
 
-    func createLabel(_ label: String) {
+    func addLabel(_ label: String) {
         self.labels[label] = .init()
     }
 
@@ -53,7 +53,7 @@ public extension GraphBasedBrewExtensionDataBase {
         self.labels.removeValue(forKey: label)
     }
 
-    func hasLabel(_ label: String) -> Bool { return self.labels[label] != nil }
+    func containsLabel(_ label: String) -> Bool { return self.labels[label] != nil }
 
     // MARK: Protected Formulaes
 
@@ -103,7 +103,7 @@ public extension GraphBasedBrewExtensionDataBase {
         self.formulaes.connect(from: from, to: to)
     }
 
-    func hasDependency(from: String, to: String) -> Bool {
+    func containsDependency(from: String, to: String) -> Bool {
         return self.formulaes.outcomings(for: from)?.contains(to) ?? false
     }
 
@@ -113,5 +113,9 @@ public extension GraphBasedBrewExtensionDataBase {
 
     func incomingDependencies(for formulae: String) -> Set<String> {
         return self.formulaes.incomings(for: formulae) ?? Set<String>()
+    }
+
+    func initializeGraph(_ graph: inout Graph<String, FormulaeInfo>) {
+        graph = self.formulaes
     }
 }

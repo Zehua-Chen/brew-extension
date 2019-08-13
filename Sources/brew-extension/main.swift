@@ -37,13 +37,13 @@ let list = try! app.addPath(["brew-extension", "list"]) { (context) in
 
     if let label = context.namedParams["--label"] as? String {
         formulaes = formulaes.filter {
-            return brewExt.formulaeGraph[$0]!.labels.contains(label)
+            return dataBase.labels(of: $0).contains(label)
         }
     }
 
     if context.namedParams["--protected"] as! Bool {
         formulaes = formulaes.filter {
-            return brewExt.formulaeGraph[$0]!.isProtected == true
+            return dataBase.protectsFormulae($0)
         }
     }
 

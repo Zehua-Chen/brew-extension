@@ -2,10 +2,10 @@ import XCTest
 @testable import BrewExtension
 
 fileprivate class SimpleDataBase: GraphBasedBrewExtensionDataBase {
-    var formulaes: BrewExtension.Formulaes
-    var labels: BrewExtension.Labels
+    var formulaes: Graph<String, FormulaeInfo>
+    var labels: [String: Set<String>]
 
-    init(formulaes: BrewExtension.Formulaes = .init(), labels: BrewExtension.Labels = .init()) {
+    init(formulaes: Graph<String, FormulaeInfo> = .init(), labels: [String: Set<String>] = .init()) {
         self.formulaes = formulaes
         self.labels = labels
     }
