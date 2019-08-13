@@ -127,7 +127,6 @@ let removeCache = try! app.addPath(["brew-extension", "remove", "cache"]) { (con
     try! dataBase.remove()
 }
 
-removeCache.addUnnamedParam(String.self)
 removeCache.registerNamedParam("--path", defaultValue: defaultdDataPath)
 
 // MARK: brew-extension remove
