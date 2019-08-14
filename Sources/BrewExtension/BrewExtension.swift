@@ -11,7 +11,7 @@
 
 import Foundation
 
-public final class BrewExtension {
+open class BrewExtension {
 
     /// The brew object used to get information from homebrew
     public internal(set) var brew: Brew
@@ -34,7 +34,7 @@ public final class BrewExtension {
     /// Sync formulae info with homebrew
     ///
     /// - Parameter providedRawInfos: the raw info of home-brew used to sync
-    public func sync(using providedRawInfos: [Brew.FormulaeInfo]? = nil) throws {
+    open func sync(using providedRawInfos: [Brew.FormulaeInfo]? = nil) throws {
         let list = try self.brew.list()
         let rawInfos: [Brew.FormulaeInfo]
 
@@ -79,7 +79,7 @@ public final class BrewExtension {
     ///
     /// - Parameter formulae: the formulae to uninstall
     /// - Returns: a list of uninstallable formulaes
-    public func findFormulaesToUninstall(for formulae: String) -> [String] {
+    open func findFormulaesToUninstall(for formulae: String) -> [String] {
         guard let db = self.dataBase else { return [] }
         guard db.containsFormulae(formulae) else { return [] }
 
@@ -120,7 +120,7 @@ public final class BrewExtension {
     /// use `findFormulaesToUninstall(for:)`
     /// - Parameter formulae: the formulae to uninstall
     /// - Throws:
-    public func uninstallFormulae(_ formulae: String) throws {
+    open func uninstallFormulae(_ formulae: String) throws {
         guard let db = self.dataBase else { return }
         guard db.containsFormulae(formulae) else { return }
 
@@ -134,7 +134,7 @@ public final class BrewExtension {
         try self.brew.uninstallFormulae(formulae)
     }
 
-    public func protectFormulae(_ formulae: String) {
+    open func protectFormulae(_ formulae: String) {
         guard let db = self.dataBase else { return }
         guard db.containsFormulae(formulae) else { return }
 
@@ -142,7 +142,7 @@ public final class BrewExtension {
         db.write()
     }
 
-    public func unprotectFormulae(_ formulae: String) {
+    open func unprotectFormulae(_ formulae: String) {
         guard let db = self.dataBase else { return }
         guard db.containsFormulae(formulae) else { return }
 
@@ -155,7 +155,7 @@ public final class BrewExtension {
     /// Get an array of formulaes
     ///
     /// - Returns: an array of formulaes
-    public func formulaes() -> [String] {
+    open func formulaes() -> [String] {
         guard let db = self.dataBase else { return [] }
         return db.formulaes()
     }
@@ -164,11 +164,11 @@ public final class BrewExtension {
     ///
     /// - Parameter label: the label to lookup formulaes with
     /// - Returns: a set of formulaes under a label
-    public func formulaes(under label: String) -> Set<String> {
+    open func formulaes(under label: String) -> Set<String> {
         return self.dataBase?.formulaes(under: label) ?? Set<String>()
     }
 
-    public func labels() -> [String] {
+    open func labels() -> [String] {
         return self.dataBase?.labels() ?? []
     }
 
@@ -177,7 +177,7 @@ public final class BrewExtension {
     /// Add a label
     ///
     /// - Parameter label: <#label description#>
-    public func addLabel(_ label: String) {
+    open func addLabel(_ label: String) {
         guard let dataBase = self.dataBase else { return }
         guard !dataBase.containsLabel(label) else { return }
 
@@ -191,7 +191,7 @@ public final class BrewExtension {
     ///   - label: the label used, if the label does not exist, a label
     ///   will be created
     /// - Throws:
-    public func labelFormulae(
+    open func labelFormulae(
         _ formulae: String,
         as label: String) throws {
         guard let dataBase = self.dataBase else { return }
@@ -209,7 +209,7 @@ public final class BrewExtension {
     /// Once a label is removed, no formulaes will have this label
     /// - Parameter label: the label to remove
     /// - Throws:
-    public func removeLabel(_ label: String) throws {
+    open func removeLabel(_ label: String) throws {
         self.dataBase?.removeLabel(label)
         self.dataBase?.write()
     }
@@ -220,7 +220,7 @@ public final class BrewExtension {
     ///   - label: the label to remove
     ///   - formulae: a formulae where the label is removed
     /// - Throws:
-    public func removeLabel(_ label: String, from formulae: String) throws {
+    open func removeLabel(_ label: String, from formulae: String) throws {
         self.dataBase?.removeLabel(label, from: formulae)
         self.dataBase?.write()
     }
