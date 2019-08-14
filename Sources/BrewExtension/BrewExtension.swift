@@ -174,11 +174,22 @@ public final class BrewExtension {
 
     // MARK: Label
 
+    /// Add a label
+    ///
+    /// - Parameter label: <#label description#>
+    public func addLabel(_ label: String) {
+        guard let dataBase = self.dataBase else { return }
+        guard !dataBase.containsLabel(label) else { return }
+
+        dataBase.addLabel(label)
+    }
+
     /// Label a formulae
     ///
     /// - Parameters:
     ///   - formulae: the formulae to label
-    ///   - label: the label used
+    ///   - label: the label used, if the label does not exist, a label
+    ///   will be created
     /// - Throws:
     public func labelFormulae(
         _ formulae: String,
