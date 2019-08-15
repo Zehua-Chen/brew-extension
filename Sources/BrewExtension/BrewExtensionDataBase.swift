@@ -44,7 +44,7 @@ public protocol BrewExtensionDataBase: AnyObject {
     /// Create a label
     ///
     /// - Parameter label: the name of the label
-    func createLabel(_ label: String)
+    func addLabel(_ label: String)
 
     /// Remove a label
     ///
@@ -52,7 +52,7 @@ public protocol BrewExtensionDataBase: AnyObject {
     /// - Parameter label: the label to remove
     func removeLabel(_ label: String)
 
-    func hasLabel(_ label: String) -> Bool
+    func containsLabel(_ label: String) -> Bool
 
     // MARK: Protected Formulaes
 
@@ -111,7 +111,7 @@ public protocol BrewExtensionDataBase: AnyObject {
     /// - Parameters:
     ///   - from: the source formulae
     ///   - to: the destination formulae
-    func hasDependency(from: String, to: String) -> Bool
+    func containsDependency(from: String, to: String) -> Bool
 
     /// Get outcoming dependencies for a formulae
     ///
@@ -125,8 +125,35 @@ public protocol BrewExtensionDataBase: AnyObject {
     /// - Returns: a set of incoming dependencies
     func incomingDependencies(for formulae: String) -> Set<String>
 
+    // MARK: Initialize graph
+    func initializeGraph(_ graph: inout Graph<String, FormulaeInfo>)
+
     // MARK: Notifications
 
     /// Write the data base to a permenant storage
     func write()
+}
+
+public extension BrewExtensionDataBase {
+    func initializeGraph(_ graph: inout Graph<String, FormulaeInfo>) {
+        graph = .init()
+
+        let formulaes = self.formulaes()
+
+        for formulae in formulaes {
+            let protected = self.protectsFormulae(formulae)
+            let labels = self.labels(of: formulae)
+            graph.insert(formulae, with: .init(
+                isProtected: protected,
+                labels: labels))
+        }
+
+        for formulae in formulaes {
+            let outcomings = self.outcomingDependencies(for: formulae)
+
+            for outcoming in outcomings {
+                graph.connect(from: formulae, to: outcoming)
+            }
+        }
+    }
 }

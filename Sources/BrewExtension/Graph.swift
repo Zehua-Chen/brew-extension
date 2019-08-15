@@ -28,7 +28,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
             self.data = data
         }
     }
-    
+
     internal enum _GraphKeys: CodingKey {
         case data
     }
@@ -80,7 +80,7 @@ public struct Graph<Node: Hashable, Data>: Sequence {
         for outbound in nodeData.outcomings {
             _data[outbound]!.incomings.remove(node)
         }
-        
+
         _data.removeValue(forKey: node)
     }
 
