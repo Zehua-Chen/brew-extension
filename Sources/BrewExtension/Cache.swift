@@ -73,6 +73,11 @@ public protocol Cache {
     /// - Parameter formulae: the formulae to protect
     mutating func protectFormulae(_ formulae: String)
 
+    /// Determine if a formulae is protected from uninstallation
+    ///
+    /// - Parameter formulae: the formulae to lookup
+    func protectsFormulae(_ formulae: String) -> Bool
+
     /// Unprotect a formulae
     ///
     /// - Parameter formulae: the formulae to unprotect

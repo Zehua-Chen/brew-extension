@@ -5,9 +5,10 @@
 //  Created by Zehua Chen on 8/12/19.
 //
 
-public class EncodableCache: Cache {
+/// A cache implementation that can be either encoded or decoded
+open class EncodableCache: Cache, Encodable, Decodable {
 
-    public struct Label: LabelProtocol, Hashable {
+    public struct Label: LabelProtocol, Hashable, Encodable, Decodable {
         public var name: String
 
         public static func ==(lhs: Label, rhs: Label) -> Bool {
@@ -19,7 +20,7 @@ public class EncodableCache: Cache {
         }
     }
 
-    public struct Formulae: FormulaeProtocol, Hashable {
+    public struct Formulae: FormulaeProtocol, Hashable, Encodable, Decodable {
         public var name: String
         public var isProtected: Bool
 
@@ -40,35 +41,44 @@ public class EncodableCache: Cache {
     fileprivate var _labels = [String: Label]()
     fileprivate var _formulaes = [String: Formulae]()
 
-    public func labels(of formulae: String) -> Set<Label> {
+    open func labels(of formulae: String) -> Set<Label> {
         guard let labelIds = _formulaesToLabels[formulae] else { return .init() }
         return Set(labelIds.lazy.map { return self._labels[$0]! })
     }
 
-    public func labels() -> [Label] {
+    open func labels() -> [Label] {
         return _labels.map { return $0.value }
     }
 
-    public func formulaes(under label: String) -> Set<Formulae> {
+    open func formulaes(under label: String) -> Set<Formulae> {
         guard let formulaeIds = _labelsToFormulaes[label] else { return .init() }
         return Set(formulaeIds.lazy.map { return self._formulaes[$0]! })
     }
 
-    public func removeLabel(_ label: String, from formulae: String) {
+    open func removeLabel(_ label: String, from formulae: String) {
         _formulaesToLabels[formulae]!.remove(label)
         _labelsToFormulaes[label]!.remove(formulae)
     }
 
-    public func addLabel(_ label: String, to formulae: String) {
+    open func addLabel(_ label: String, to formulae: String) {
+        if _formulaesToLabels[formulae] == nil {
+            _formulaesToLabels[formulae] = .init()
+        }
+
         _formulaesToLabels[formulae]!.insert(label)
+
+        if _labelsToFormulaes[label] == nil {
+            _labelsToFormulaes[label] = .init()
+        }
+
         _labelsToFormulaes[label]!.insert(formulae)
     }
 
-    public func addLabel(_ label: String) {
+    open func addLabel(_ label: String) {
         _labels[label] = .init(name: label)
     }
 
-    public func removeLabel(_ label: String) {
+    open func removeLabel(_ label: String) {
 
         for formulae in _labelsToFormulaes[label]! {
             _formulaesToLabels[formulae]!.remove(label)
@@ -78,35 +88,39 @@ public class EncodableCache: Cache {
         _labels.removeValue(forKey: label)
     }
 
-    public func containsLabel(_ label: String) -> Bool {
+    open func containsLabel(_ label: String) -> Bool {
         return _labels[label] != nil
     }
 
-    public func protectFormulae(_ formulae: String) {
+    open func protectFormulae(_ formulae: String) {
         _formulaes[formulae]!.isProtected = true
     }
 
-    public func unprotectFormulae(_ formulae: String) {
+    open func protectsFormulae(_ formulae: String) -> Bool {
+        return _formulaes[formulae]!.isProtected
+    }
+
+    open func unprotectFormulae(_ formulae: String) {
         _formulaes[formulae]!.isProtected = false
     }
 
-    public func containsFormulae(_ formulae: String) -> Bool {
+    open func containsFormulae(_ formulae: String) -> Bool {
         return _formulaes[formulae] != nil
     }
 
-    public func addFormulae(_ formulae: String) {
+    open func addFormulae(_ formulae: String) {
         _formulaes[formulae] = .init(name: formulae, isProtected: false)
     }
 
-    public func removeFormulae(_ formulae: String) {
+    open func removeFormulae(_ formulae: String) {
         _formulaes.removeValue(forKey: formulae)
     }
 
-    public func formulaes() -> [Formulae] {
+    open func formulaes() -> [Formulae] {
         return _formulaes.map { return $0.value }
     }
 
-    public func addDependency(from: String, to: String) {
+    open func addDependency(from: String, to: String) {
         if _outcomings[from] == nil {
             _outcomings[from] = Set()
         }
@@ -120,16 +134,16 @@ public class EncodableCache: Cache {
         _incomings[to]?.insert(from)
     }
 
-    public func containsDependency(from: String, to: String) -> Bool {
+    open func containsDependency(from: String, to: String) -> Bool {
         return _outcomings[from]?.contains(to) ?? false
     }
 
-    public func outcomingDependencies(for formulae: String) -> Set<Formulae> {
+    open func outcomingDependencies(for formulae: String) -> Set<Formulae> {
         guard let outcomingAt = _outcomings[formulae] else { return .init() }
         return Set(outcomingAt.lazy.map { return self._formulaes[$0]! })
     }
 
-    public func incomingDependencies(for formulae: String) -> Set<Formulae> {
+    open func incomingDependencies(for formulae: String) -> Set<Formulae> {
         guard let incomingsAt = _incomings[formulae] else { return .init() }
         return Set(incomingsAt.lazy.map { return self._formulaes[$0]! })
     }

@@ -10,11 +10,11 @@
 #endif
 
 public protocol SyncOperation {
-    func run<C: Cache>(with cache: inout C, using brew: Brew) throws
+    func sync<C: Cache>(into cache: inout C, using brew: Brew) throws
 }
 
 public extension SyncOperation {
-    func run<C: Cache>(with cache: inout C, using brew: Brew) throws {
+    func sync<C: Cache>(into cache: inout C, using brew: Brew) throws {
         let rawInfos = try brew.info(of: try brew.list())
         let rawNames = Set(rawInfos.lazy.map { return $0.name })
 

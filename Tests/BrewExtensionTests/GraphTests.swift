@@ -6,12 +6,12 @@
 //
 
 import XCTest
-import BrewExtension
+@testable import BrewExtension
 
 final class GraphTests: XCTestCase {
     
     func testAdd() {
-        var graph = Graph<Int, Int>()
+        var graph = _Graph<Int, Int>()
 
         graph.insert(0, with: 0)
         graph.insert(2, with: 0)
@@ -21,7 +21,7 @@ final class GraphTests: XCTestCase {
     }
 
     func testRemove() {
-        var graph = Graph<Int, Int>()
+        var graph = _Graph<Int, Int>()
 
         graph.insert(1, with: 0)
         graph.insert(2, with: 0)
@@ -42,7 +42,7 @@ final class GraphTests: XCTestCase {
     }
 
     func testConnect() {
-        var graph = Graph<Int, Int>()
+        var graph = _Graph<Int, Int>()
 
         graph.insert(0, with: 0)
         graph.insert(1, with: 0)
@@ -68,7 +68,7 @@ final class GraphTests: XCTestCase {
     }
 
     func testSequence() {
-        var graph = Graph<Int, Int>()
+        var graph = _Graph<Int, Int>()
         graph.insert(1, with: 0)
         graph.insert(2, with: 0)
         graph.insert(3, with: 0)
