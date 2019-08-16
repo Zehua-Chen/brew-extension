@@ -6,11 +6,11 @@
 //
 
 public protocol FindUninstallablesOperation {
-    func findUninstallFormulae<C: Cache>(for formulae: String, cache: C) -> [C.Formulae]
+    func findUninstallableFormulaes<C: Cache>(for formulae: String, cache: C) -> [C.Formulae]
 }
 
 public extension FindUninstallablesOperation {
-    func findUninstallFormulae<C: Cache>(for formulae: String, cache: C) -> [C.Formulae] {
+    func findUninstallableFormulaes<C: Cache>(for formulae: String, cache: C) -> [C.Formulae] {
         // MARK: Create a copy of the cache's graph
         var graph = _Graph<String, C.Formulae>()
         let formulaes = cache.formulaes()

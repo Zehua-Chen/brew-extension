@@ -41,6 +41,8 @@ open class EncodableCache: Cache, Encodable, Decodable {
     fileprivate var _labels = [String: Label]()
     fileprivate var _formulaes = [String: Formulae]()
 
+    public init() {}
+
     open func labels(of formulae: String) -> Set<Label> {
         guard let labelIds = _formulaesToLabels[formulae] else { return .init() }
         return Set(labelIds.lazy.map { return self._labels[$0]! })
