@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.source = {
     :git => 'https://github.com/Zehua-Chen/brew-extension.git',
     # :tag => s.version.to_s
-    :branch => "cocoapods"
+    :branch => "master"
   }
 
   s.subspec 'Brew' do |hb|
