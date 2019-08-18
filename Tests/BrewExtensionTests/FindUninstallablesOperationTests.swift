@@ -5,12 +5,12 @@ final class FindUninstallablesOperationTests: XCTestCase, FindUninstallablesOper
 
     // MARK: Uninstall Without User Package
 
-    fileprivate func _findUninstallFormulae(for formulae: String, cache: EncodableCache) -> Set<String> {
-        return Set(self.findUninstallFormulae(for: "target", cache: cache).lazy.map{ return $0.name })
+    fileprivate func _findUninstallFormulae(for formulae: String, cache: EncodableDataSource) -> Set<String> {
+        return Set(self.findUninstallableFormulaes(for: "target", using: cache))
     }
 
     func testUninstallSimple() {
-        let cache = EncodableCache()
+        let cache = EncodableDataSource()
 
         cache.addFormulae("target")
         cache.addFormulae("0-1")
@@ -30,7 +30,7 @@ final class FindUninstallablesOperationTests: XCTestCase, FindUninstallablesOper
     }
 
     func testUninstallComplex() {
-        let cache = EncodableCache()
+        let cache = EncodableDataSource()
 
         cache.addFormulae("target")
         cache.addFormulae("0-1")
@@ -55,7 +55,7 @@ final class FindUninstallablesOperationTests: XCTestCase, FindUninstallablesOper
     }
 
     func testUninstallMultiDepth() {
-        let cache = EncodableCache()
+        let cache = EncodableDataSource()
 
         cache.addFormulae("target")
         cache.addFormulae("0-1")
@@ -92,7 +92,7 @@ final class FindUninstallablesOperationTests: XCTestCase, FindUninstallablesOper
     // MARK: Uninstall With User Package
 
     func testUserPackageUninstall() {
-        let graph = EncodableCache()
+        let graph = EncodableDataSource()
         // User packages
         graph.addFormulae("target")
         graph.addFormulae("0-1")

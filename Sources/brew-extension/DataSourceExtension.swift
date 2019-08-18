@@ -9,14 +9,14 @@ import SwiftArgParse
 import Foundation
 import BrewExtension
 
-extension EncodableCache {
-    static func load(with context: ASTContext) -> EncodableCache {
+extension EncodableDataSource {
+    static func load(with context: ASTContext) -> EncodableDataSource {
         guard let data = try? Data(contentsOf: .init(fileURLWithPath: context.namedParams["--path"] as! String)) else {
             return .init()
         }
 
         let decoder = JSONDecoder()
-        return try! decoder.decode(EncodableCache.self, from: data)
+        return try! decoder.decode(EncodableDataSource.self, from: data)
     }
 
     func save(with context: ASTContext) {

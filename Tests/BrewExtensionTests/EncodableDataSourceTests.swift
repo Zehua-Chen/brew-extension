@@ -8,10 +8,10 @@
 import XCTest
 @testable import BrewExtension
 
-class EncodableCacheTest: XCTestCase {
+class EncodaleDataSourceTests: XCTestCase {
 
     func testFormulaes() {
-        let database = EncodableCache()
+        let database = EncodableDataSource()
 
         database.addFormulae("cmake")
         database.addFormulae("llvm")
@@ -30,7 +30,7 @@ class EncodableCacheTest: XCTestCase {
     }
 
     func testDependencies() {
-        let database = EncodableCache()
+        let database = EncodableDataSource()
 
         database.addFormulae("cmake")
         database.addFormulae("llvm")
@@ -45,21 +45,36 @@ class EncodableCacheTest: XCTestCase {
 
         database.addDependency(from: "open_cv", to: "llvm")
 
-        let llvmIncomings = database.incomingDependencies(for: "llvm").map { return $0.name }
+        let llvmIncomings = database.incomingDependencies(for: "llvm")
         XCTAssertEqual(llvmIncomings.count, 2)
         XCTAssertTrue(llvmIncomings.contains("cmake"))
         XCTAssertTrue(llvmIncomings.contains("open_cv"))
 
         database.addDependency(from: "cmake", to: "open_cv")
 
-        let cmakeOutcomings = database.outcomingDependencies(for: "cmake").map { return $0.name }
+        let cmakeOutcomings = database.outcomingDependencies(for: "cmake")
         XCTAssertEqual(cmakeOutcomings.count, 2)
         XCTAssertTrue(cmakeOutcomings.contains("llvm"))
         XCTAssertTrue(cmakeOutcomings.contains("open_cv"))
     }
 
+    func testDependencyWithFormulaeRemoval() {
+        let database = EncodableDataSource()
+
+        database.addFormulae("cmake")
+        database.addFormulae("llvm")
+
+        // Remove from source
+        database.addDependency(from: "cmake", to: "llvm")
+        database.addDependency(from: "llvm", to: "cmake")
+        database.removeFormulae("cmake")
+
+        XCTAssertFalse(database.containsDependency(from: "cmake", to: "llvm"))
+        XCTAssertFalse(database.containsDependency(from: "llvm", to: "cmake"))
+    }
+
     func testProtection() {
-        let database = EncodableCache()
+        let database = EncodableDataSource()
 
         database.addFormulae("cmake")
 
@@ -71,7 +86,7 @@ class EncodableCacheTest: XCTestCase {
     }
 
     func testLabels() {
-        let database = EncodableCache()
+        let database = EncodableDataSource()
 
         // MARK: Setup formulaes
         database.addFormulae("valgrind")
