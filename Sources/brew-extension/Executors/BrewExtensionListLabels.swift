@@ -10,7 +10,7 @@ import BrewExtension
 
 struct BrewExtensionListLabels: Executor {
     func run(with context: ASTContext) {
-        let cache = EncodableCache.load(with: context)
+        let cache = EncodableDataSource.load(with: context)
         let labels = cache.labels()
 
         for label in labels {

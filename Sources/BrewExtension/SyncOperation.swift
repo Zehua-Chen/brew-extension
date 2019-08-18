@@ -9,19 +9,59 @@
     import Brew
 #endif
 
+/// A data source that provides data to a sync operation
 public protocol SyncOperationDataSource {
+
+    /// Determine if a formulae is present
+    ///
+    /// - Parameter name: the name of the formulae
+    /// - Returns: if the formulae is present
     func containsFormulae(_ name: String) -> Bool
-    mutating func addFormulae(_ name: String)
-    mutating func removeFormulae(_ name: String)
+
+    /// Get a list of formulaes
+    ///
+    /// - Returns: an array of formulae names
     func formulaes() -> [String]
 
-    func containsDependency(from name: String, to name: String) -> Bool
-    mutating func addDependency(from name: String, to name: String)
+    /// Determine if a dependency exists between two formulaes
+    ///
+    /// - Parameters:
+    ///   - sourceName: the name of the formulae where the dependency originates
+    ///   - targetName: the name of the formulae where the dependency ends
+    /// - Returns: if the dependency is found
+    func containsDependency(from sourceName: String, to targetName: String) -> Bool
+
+    /// Add a formulae
+    ///
+    /// - Parameter name: the name to be used on the added formulae
+    mutating func addFormulae(_ name: String)
+
+    /// Remove a formulae
+    ///
+    /// - Parameter name: the name of the formulae to remove
+    mutating func removeFormulae(_ name: String)
+
+    /// Add a dependency from one formulae to anothe formulae
+    ///
+    /// - Parameters:
+    ///   - sourceName: the name of the formulae where the dependency originates
+    ///   - targetName: the name of the formulae where the dependency ends
+    mutating func addDependency(from sourceName: String, to targetName: String)
 }
 
+/// Sync data with homebrew and save the synced data into a datasource
 public protocol SyncOperation {
+
+   /// Sync data with homebrew
+   ///
+   /// - Parameters:
+   ///   - dataSource: the datasource to write the synced information into
+   ///   - brew: a brew object to get data from
+   /// - Throws:
    func sync<DataSource: SyncOperationDataSource>(into dataSource: inout DataSource, brew: Brew) throws
 }
+
+// MARK: - Default Implementation of `SyncOperation`
 
 public extension SyncOperation {
     func sync<DataSource: SyncOperationDataSource>(into dataSource: inout DataSource, brew: Brew) throws {

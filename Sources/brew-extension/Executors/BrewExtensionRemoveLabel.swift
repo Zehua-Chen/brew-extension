@@ -11,7 +11,7 @@ import BrewExtension
 struct BrewExtensionRemoveLabel: Executor {
     func run(with context: ASTContext) {
         let label = context.unnamedParams[0] as! String
-        let cache = EncodableCache.load(with: context)
+        let cache = EncodableDataSource.load(with: context)
 
         cache.removeLabel(label)
 

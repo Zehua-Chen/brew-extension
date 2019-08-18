@@ -8,10 +8,10 @@
 import XCTest
 @testable import BrewExtension
 
-class EncodableCacheTest: XCTestCase {
+class EncodaleDataSourceTests: XCTestCase {
 
     func testFormulaes() {
-        let database = EncodableCache()
+        let database = EncodableDataSource()
 
         database.addFormulae("cmake")
         database.addFormulae("llvm")
@@ -30,7 +30,7 @@ class EncodableCacheTest: XCTestCase {
     }
 
     func testDependencies() {
-        let database = EncodableCache()
+        let database = EncodableDataSource()
 
         database.addFormulae("cmake")
         database.addFormulae("llvm")
@@ -59,7 +59,7 @@ class EncodableCacheTest: XCTestCase {
     }
 
     func testProtection() {
-        let database = EncodableCache()
+        let database = EncodableDataSource()
 
         database.addFormulae("cmake")
 
@@ -71,7 +71,7 @@ class EncodableCacheTest: XCTestCase {
     }
 
     func testLabels() {
-        let database = EncodableCache()
+        let database = EncodableDataSource()
 
         // MARK: Setup formulaes
         database.addFormulae("valgrind")

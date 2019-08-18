@@ -11,7 +11,7 @@ import SwiftArgParse
 
 struct BrewExtensionSync: SyncOperation, Executor {
     func run(with context: ASTContext) {
-        var cache = EncodableCache.load(with: context)
+        var cache = EncodableDataSource.load(with: context)
         try! self.sync(into: &cache, brew: .init())
 
         cache.save(with: context)

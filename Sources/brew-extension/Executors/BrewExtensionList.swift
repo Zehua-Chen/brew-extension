@@ -10,7 +10,7 @@ import SwiftArgParse
 
 struct BrewExtensionList: Executor {
     func run(with context: ASTContext) {
-        let cache = EncodableCache.load(with: context)
+        let cache = EncodableDataSource.load(with: context)
         var formulaes = cache.formulaes()
 
         if context.namedParams["--protected"] as! Bool {

@@ -12,7 +12,7 @@ struct BrewExtensionLabel: Executor {
     func run(with context: ASTContext) {
         let formulae = context.unnamedParams[0] as! String
         let label = context.unnamedParams[1] as! String
-        let cache = EncodableCache.load(with: context)
+        let cache = EncodableDataSource.load(with: context)
 
         if !cache.containsLabel(label) {
             cache.addLabel(label)

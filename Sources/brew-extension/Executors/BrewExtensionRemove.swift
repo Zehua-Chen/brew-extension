@@ -11,7 +11,7 @@ import BrewExtension
 struct BrewExtensionRemove: Executor, FindUninstallablesOperation, UninstallOperation {
 
     func run(with context: ASTContext) {
-        var cache = EncodableCache.load(with: context)
+        var cache = EncodableDataSource.load(with: context)
         let formulaeToUninstall = context.unnamedParams[0] as! String
 
         let uninstalls = self.findUninstallableFormulaes(for: formulaeToUninstall, using: cache)

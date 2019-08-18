@@ -131,7 +131,8 @@ public struct Brew {
 
         guard let text = String(
             data: try _run(args: args),
-            encoding: .utf8) else {
+            encoding: .utf8
+        ) else {
             throw BrewError.decoding
         }
 

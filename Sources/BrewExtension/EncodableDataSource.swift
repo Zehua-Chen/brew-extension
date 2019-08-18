@@ -5,11 +5,9 @@
 //  Created by Zehua Chen on 8/12/19.
 //
 
-/// A cache implementation that can be either encoded or decoded
-open class EncodableCache:
-    UninstallOperationDataSource,
-    FindUninstallablesOperationDataSource,
-    SyncOperationDataSource,
+/// A data source implementation that can be either encoded or decoded
+open class EncodableDataSource:
+    DataSource,
     Encodable,
     Decodable {
 
@@ -23,6 +21,10 @@ open class EncodableCache:
 
     public init() {}
 
+    /// Get the labels of a formulae
+    ///
+    /// - Parameter formulae: the formulae to look up
+    /// - Returns: a list of labels
     open func labels(of formulae: String) -> Set<String> {
         return _formulaesToLabels[formulae] ?? .init()
     }
@@ -93,6 +95,7 @@ open class EncodableCache:
     }
 
     open func removeFormulae(_ formulae: String) {
+        _protectedFormulaes.remove(formulae)
         _formulaes.remove(formulae)
     }
 
