@@ -58,6 +58,21 @@ class EncodaleDataSourceTests: XCTestCase {
         XCTAssertTrue(cmakeOutcomings.contains("open_cv"))
     }
 
+    func testDependencyWithFormulaeRemoval() {
+        let database = EncodableDataSource()
+
+        database.addFormulae("cmake")
+        database.addFormulae("llvm")
+
+        // Remove from source
+        database.addDependency(from: "cmake", to: "llvm")
+        database.addDependency(from: "llvm", to: "cmake")
+        database.removeFormulae("cmake")
+
+        XCTAssertFalse(database.containsDependency(from: "cmake", to: "llvm"))
+        XCTAssertFalse(database.containsDependency(from: "llvm", to: "cmake"))
+    }
+
     func testProtection() {
         let database = EncodableDataSource()
 

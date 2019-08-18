@@ -23,109 +23,137 @@ open class EncodableDataSource:
 
     /// Get the labels of a formulae
     ///
-    /// - Parameter formulae: the formulae to look up
+    /// - Parameter formulaeName: the name of the formulae to look up
     /// - Returns: a list of labels
-    open func labels(of formulae: String) -> Set<String> {
-        return _formulaesToLabels[formulae] ?? .init()
+    open func labels(of formulaeName: String) -> Set<String> {
+        return _formulaesToLabels[formulaeName] ?? .init()
     }
 
     open func labels() -> [String] {
         return Array(_labels)
     }
 
-    open func formulaes(under label: String) -> Set<String> {
-        return _labelsToFormulaes[label] ?? .init()
+    open func formulaes(under labelName: String) -> Set<String> {
+        return _labelsToFormulaes[labelName] ?? .init()
     }
 
-    open func removeLabel(_ label: String, from formulae: String) {
-        _formulaesToLabels[formulae]!.remove(label)
-        _labelsToFormulaes[label]!.remove(formulae)
+    open func removeLabel(_ labelName: String, from formulaeName: String) {
+        _formulaesToLabels[formulaeName]!.remove(labelName)
+        _labelsToFormulaes[labelName]!.remove(formulaeName)
     }
 
-    open func addLabel(_ label: String, to formulae: String) {
-        if _formulaesToLabels[formulae] == nil {
-            _formulaesToLabels[formulae] = .init()
+    open func addLabel(_ labelName: String, to formulaeName: String) {
+        if _formulaesToLabels[formulaeName] == nil {
+            _formulaesToLabels[formulaeName] = .init()
         }
 
-        _formulaesToLabels[formulae]!.insert(label)
+        _formulaesToLabels[formulaeName]!.insert(labelName)
 
-        if _labelsToFormulaes[label] == nil {
-            _labelsToFormulaes[label] = .init()
+        if _labelsToFormulaes[labelName] == nil {
+            _labelsToFormulaes[labelName] = .init()
         }
 
-        _labelsToFormulaes[label]!.insert(formulae)
+        _labelsToFormulaes[labelName]!.insert(formulaeName)
     }
 
-    open func addLabel(_ label: String) {
-        _labels.insert(label)
+    open func addLabel(_ name: String) {
+        _labels.insert(name)
     }
 
-    open func removeLabel(_ label: String) {
+    open func removeLabel(_ name: String) {
 
-        for formulae in _labelsToFormulaes[label]! {
-            _formulaesToLabels[formulae]!.remove(label)
+        for formulae in _labelsToFormulaes[name]! {
+            _formulaesToLabels[formulae]!.remove(name)
         }
 
-        _labelsToFormulaes.removeValue(forKey: label)
-        _labels.remove(label)
+        _labelsToFormulaes.removeValue(forKey: name)
+        _labels.remove(name)
     }
 
-    open func containsLabel(_ label: String) -> Bool {
-        return _labels.contains(label)
+    open func containsLabel(_ name: String) -> Bool {
+        return _labels.contains(name)
     }
 
-    open func protectFormulae(_ formulae: String) {
-        _protectedFormulaes.insert(formulae)
+    open func protectFormulae(_ name: String) {
+        _protectedFormulaes.insert(name)
     }
 
-    open func protectsFormulae(_ formulae: String) -> Bool {
-        return _protectedFormulaes.contains(formulae)
+    open func protectsFormulae(_ name: String) -> Bool {
+        return _protectedFormulaes.contains(name)
     }
 
-    open func unprotectFormulae(_ formulae: String) {
-        _protectedFormulaes.remove(formulae)
+    open func unprotectFormulae(_ name: String) {
+        _protectedFormulaes.remove(name)
     }
 
-    open func containsFormulae(_ formulae: String) -> Bool {
-        return _formulaes.contains(formulae)
+    open func containsFormulae(_ name: String) -> Bool {
+        return _formulaes.contains(name)
     }
 
-    open func addFormulae(_ formulae: String) {
-        _formulaes.insert(formulae)
+    open func addFormulae(_ name: String) {
+        _formulaes.insert(name)
     }
 
-    open func removeFormulae(_ formulae: String) {
-        _protectedFormulaes.remove(formulae)
-        _formulaes.remove(formulae)
+    open func removeFormulae(_ name: String) {
+        // Remove dependencies
+        if let outcomings = _outcomings[name] {
+            for outcoming in outcomings {
+                _incomings[outcoming]!.remove(name)
+            }
+        }
+
+        if let incomings = _incomings[name] {
+            for incoming in incomings {
+                _outcomings[incoming]!.remove(name)
+            }
+        }
+
+        _outcomings.removeValue(forKey: name)
+        _incomings.removeValue(forKey: name)
+
+        // Remove formulae from associated labels
+
+        if let associatedLabels = _formulaesToLabels[name] {
+            for label in associatedLabels {
+                _labelsToFormulaes[label]!.remove(name)
+            }
+        }
+
+        _formulaesToLabels.removeValue(forKey: name)
+
+        // Remove formulae
+
+        _protectedFormulaes.remove(name)
+        _formulaes.remove(name)
     }
 
     open func formulaes() -> [String] {
         return Array(_formulaes)
     }
 
-    open func addDependency(from: String, to: String) {
-        if _outcomings[from] == nil {
-            _outcomings[from] = Set()
+    open func addDependency(from sourceName: String, to targetName: String) {
+        if _outcomings[sourceName] == nil {
+            _outcomings[sourceName] = Set()
         }
 
-        _outcomings[from]!.insert(to)
+        _outcomings[sourceName]!.insert(targetName)
 
-        if _incomings[to] == nil {
-            _incomings[to] = Set()
+        if _incomings[targetName] == nil {
+            _incomings[targetName] = Set()
         }
 
-        _incomings[to]?.insert(from)
+        _incomings[targetName]!.insert(sourceName)
     }
 
-    open func containsDependency(from: String, to: String) -> Bool {
-        return _outcomings[from]?.contains(to) ?? false
+    open func containsDependency(from sourceName: String, to targetName: String) -> Bool {
+        return _outcomings[sourceName]?.contains(targetName) ?? false
     }
 
-    open func outcomingDependencies(for formulae: String) -> Set<String> {
-        return _outcomings[formulae] ?? .init()
+    open func outcomingDependencies(for name: String) -> Set<String> {
+        return _outcomings[name] ?? .init()
     }
 
-    open func incomingDependencies(for formulae: String) -> Set<String> {
-        return _incomings[formulae] ?? .init()
+    open func incomingDependencies(for name: String) -> Set<String> {
+        return _incomings[name] ?? .init()
     }
 }
