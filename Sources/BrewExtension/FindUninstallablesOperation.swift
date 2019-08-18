@@ -5,25 +5,35 @@
 //  Created by Zehua Chen on 8/15/19.
 //
 
+public protocol FindUninstallablesOperationDataSource {
+    func formulaes() -> [String]
+    func outcomingDependencies(for name: String) -> Set<String>
+    func protectsFormulae(_ name: String) -> Bool
+}
+
 public protocol FindUninstallablesOperation {
-    func findUninstallableFormulaes<C: Cache>(for formulae: String, cache: C) -> [C.Formulae]
+    func findUninstallableFormulaes<
+        DataSource: FindUninstallablesOperationDataSource
+    >(for formulae: String, using dataSource: DataSource) -> [String]
 }
 
 public extension FindUninstallablesOperation {
-    func findUninstallableFormulaes<C: Cache>(for formulae: String, cache: C) -> [C.Formulae] {
+    func findUninstallableFormulaes<
+        DataSource: FindUninstallablesOperationDataSource
+    >(for formulae: String, using dataSource: DataSource) -> [String] {
         // MARK: Create a copy of the cache's graph
-        var graph = _Graph<String, C.Formulae>()
-        let formulaes = cache.formulaes()
+        var graph = _Graph<String, Bool>()
+        let formulaes = dataSource.formulaes()
 
         for formulae in formulaes {
-            graph.insert(formulae.name, with: formulae)
+            graph.insert(formulae, with: dataSource.protectsFormulae(formulae))
         }
 
         for formulae in formulaes {
-            let outcomings = cache.outcomingDependencies(for: formulae.name)
+            let outcomings = dataSource.outcomingDependencies(for: formulae)
 
             for outcoming in outcomings {
-                graph.connect(from: formulae.name, to: outcoming.name)
+                graph.connect(from: formulae, to: outcoming)
             }
         }
 
@@ -31,28 +41,28 @@ public extension FindUninstallablesOperation {
 
         guard graph.contains(formulae) else { return [] }
 
-        var uninstalls = [C.Formulae]()
+        var uninstalls = [String]()
 
-        var dict = [String: C.Formulae]()
-        dict[formulae] = graph.data(for: formulae)!
+        var set = Set<String>()
+        set.insert(formulae)
 
-        while let current = dict.popFirst() {
-            let incomings = graph.incomings(for: current.key)!
-            let data = current.value
+        while let current = set.popFirst() {
+            let incomings = graph.incomings(for: current)!
+            let isProtected = graph.data(for: current)!
 
             guard incomings.isEmpty else { continue }
 
-            if (data.isProtected && current.key == formulae) || !data.isProtected {
-                let outcomings = graph.outcomings(for: current.key)!
+            if (isProtected && current == formulae) || !isProtected {
+                let outcomings = graph.outcomings(for: current)!
 
                 for outcoming in outcomings {
-                    if dict[outcoming] == nil {
-                        dict[outcoming] = graph.data(for: outcoming)!
+                    if !set.contains(outcoming) {
+                        set.insert(outcoming)
                     }
                 }
 
-                graph.remove(current.key)
-                uninstalls.append(current.value)
+                graph.remove(current)
+                uninstalls.append(current)
             }
         }
 

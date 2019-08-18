@@ -9,16 +9,17 @@ import SwiftArgParse
 import BrewExtension
 
 struct BrewExtensionRemove: Executor, FindUninstallablesOperation, UninstallOperation {
+
     func run(with context: ASTContext) {
         var cache = EncodableCache.load(with: context)
         let formulaeToUninstall = context.unnamedParams[0] as! String
 
-        let uninstalls = self.findUninstallableFormulaes(for: formulaeToUninstall, cache: cache)
+        let uninstalls = self.findUninstallableFormulaes(for: formulaeToUninstall, using: cache)
 
         print("the following packages will be uninstalled")
 
         for uninstall in uninstalls {
-            print(uninstall.name)
+            print(uninstall)
         }
 
         var yes = context.namedParams["--yes"] as! Bool
@@ -29,7 +30,7 @@ struct BrewExtensionRemove: Executor, FindUninstallablesOperation, UninstallOper
 
         if yes {
             for uninstall in uninstalls {
-                try! self.uninstallFormulae(uninstall.name, cache: &cache, brew: .init())
+                try! self.uninstallFormulae(uninstall, with: .init(), using: &cache)
             }
         }
 

@@ -45,14 +45,14 @@ class EncodableCacheTest: XCTestCase {
 
         database.addDependency(from: "open_cv", to: "llvm")
 
-        let llvmIncomings = database.incomingDependencies(for: "llvm").map { return $0.name }
+        let llvmIncomings = database.incomingDependencies(for: "llvm")
         XCTAssertEqual(llvmIncomings.count, 2)
         XCTAssertTrue(llvmIncomings.contains("cmake"))
         XCTAssertTrue(llvmIncomings.contains("open_cv"))
 
         database.addDependency(from: "cmake", to: "open_cv")
 
-        let cmakeOutcomings = database.outcomingDependencies(for: "cmake").map { return $0.name }
+        let cmakeOutcomings = database.outcomingDependencies(for: "cmake")
         XCTAssertEqual(cmakeOutcomings.count, 2)
         XCTAssertTrue(cmakeOutcomings.contains("llvm"))
         XCTAssertTrue(cmakeOutcomings.contains("open_cv"))

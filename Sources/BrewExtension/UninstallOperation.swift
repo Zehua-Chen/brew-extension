@@ -9,19 +9,30 @@
     import Brew
 #endif
 
+public protocol UninstallOperationDataSource {
+    func containsFormulae(_ name: String) -> Bool
+    func labels(of formulaeName: String) -> Set<String>
+    mutating func removeLabel(_ labelName: String, from formulaeName: String)
+    mutating func removeFormulae(_ name: String)
+}
+
 public protocol UninstallOperation {
-    func uninstallFormulae<C: Cache>(_ formulae: String, cache: inout C, brew: Brew) throws
+    func uninstallFormulae<
+        DataSource: UninstallOperationDataSource
+    >(_ formulae: String, with brew: Brew, using dataSource: inout DataSource) throws
 }
 
 public extension UninstallOperation {
-    func uninstallFormulae<C: Cache>(_ formulae: String, cache: inout C, brew: Brew) throws {
-        guard cache.containsFormulae(formulae) else { return }
+    func uninstallFormulae<
+        DataSource: UninstallOperationDataSource
+    >(_ formulae: String, with brew: Brew, using dataSource: inout DataSource) throws {
+        guard dataSource.containsFormulae(formulae) else { return }
 
-        for label in cache.labels(of: formulae) {
-            cache.removeLabel(label.name, from: formulae)
+        for label in dataSource.labels(of: formulae) {
+            dataSource.removeLabel(label, from: formulae)
         }
 
-        cache.removeFormulae(formulae)
+        dataSource.removeFormulae(formulae)
 
         try brew.uninstallFormulae(formulae)
     }

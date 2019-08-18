@@ -6,7 +6,7 @@ final class FindUninstallablesOperationTests: XCTestCase, FindUninstallablesOper
     // MARK: Uninstall Without User Package
 
     fileprivate func _findUninstallFormulae(for formulae: String, cache: EncodableCache) -> Set<String> {
-        return Set(self.findUninstallFormulae(for: "target", cache: cache).lazy.map{ return $0.name })
+        return Set(self.findUninstallableFormulaes(for: "target", using: cache))
     }
 
     func testUninstallSimple() {

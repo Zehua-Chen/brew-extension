@@ -11,7 +11,7 @@ import SwiftArgParse
 struct BrewExtensionList: Executor {
     func run(with context: ASTContext) {
         let cache = EncodableCache.load(with: context)
-        var formulaes = cache.formulaes().map { return $0.name }
+        var formulaes = cache.formulaes()
 
         if context.namedParams["--protected"] as! Bool {
             formulaes = formulaes.filter {
@@ -21,7 +21,7 @@ struct BrewExtensionList: Executor {
 
         if let label = context.namedParams["--label"] as? String {
             formulaes = formulaes.filter {
-                return cache.labels(of: $0).contains(where: { return $0.name == label })
+                return cache.labels(of: $0).contains(label)
             }
         }
 
