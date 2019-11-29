@@ -8,18 +8,26 @@
 import BrewExtension
 import SwiftArgParse
 
-struct BrewExtensionList: Executor {
-    func run(with context: ASTContext) {
+struct BrewExtensionList: Command {
+
+    func setup(with config: Configuration) {
+        config.usePathOption()
+        config.use(Option(name: "--label", defaultValue: ""))
+        config.use(Option(name: "--protected", defaultValue: false))
+        config.use(BrewExtensionListLabels(), for: "labels")
+    }
+    
+    func run(with context: CommandContext) {
         let cache = EncodableDataSource.load(with: context)
         var formulaes = cache.formulaes()
 
-        if context.namedParams["--protected"] as! Bool {
+        if context.options["--protected"] as! Bool {
             formulaes = formulaes.filter {
                 return cache.protectsFormulae($0)
             }
         }
 
-        if let label = context.namedParams["--label"] as? String {
+        if let label = context.options["--label"] as? String {
             formulaes = formulaes.filter {
                 return cache.labels(of: $0).contains(label)
             }

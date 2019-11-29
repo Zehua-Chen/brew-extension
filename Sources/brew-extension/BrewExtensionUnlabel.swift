@@ -8,10 +8,17 @@
 import SwiftArgParse
 import BrewExtension
 
-struct BrewExtensionUnlabel: Executor {
-    func run(with context: ASTContext) {
-        let formulae = context.unnamedParams[0] as! String
-        let label = context.unnamedParams[1] as! String
+struct BrewExtensionUnlabel: Command {
+
+    func setup(with config: Configuration) {
+        config.usePathOption()
+        config.use(Parameter(type: String.self))
+        config.use(Parameter(type: String.self))
+    }
+    
+    func run(with context: CommandContext) {
+        let formulae = context.parameters[0] as! String
+        let label = context.parameters[1] as! String
         let cache = EncodableDataSource.load(with: context)
 
         guard cache.containsLabel(label) else { return }

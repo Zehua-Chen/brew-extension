@@ -8,10 +8,15 @@
 import SwiftArgParse
 import BrewExtension
 
-struct BrewExtensionUnprotect: Executor {
-    func run(with context: ASTContext) {
+struct BrewExtensionUnprotect: Command {
+    func setup(with config: Configuration) {
+        config.usePathOption()
+        config.use(Parameter(type: String.self))
+    }
+
+    func run(with context: CommandContext) {
         let cache = EncodableDataSource.load(with: context)
-        let formulae = context.unnamedParams[0] as! String
+        let formulae = context.parameters[0] as! String
 
         guard cache.containsFormulae(formulae) else { return }
 
