@@ -22,15 +22,20 @@ struct BrewExtensionList: Command {
         var formulaes = cache.formulaes()
 
         if context.options["--protected"] as! Bool {
-            formulaes = formulaes.filter {
-                return cache.protectsFormulae($0)
-            }
+            formulaes = formulaes
+                .filter {
+                    return cache.protectsFormulae($0)
+                }
         }
 
         if let label = context.options["--label"] as? String {
-            formulaes = formulaes.filter {
-                return cache.labels(of: $0).contains(label)
+            if !label.isEmpty {
+                formulaes = formulaes
+                    .filter {
+                        return cache.labels(of: $0).contains(label)
+                    }
             }
+
         }
 
         for formulae in formulaes {
