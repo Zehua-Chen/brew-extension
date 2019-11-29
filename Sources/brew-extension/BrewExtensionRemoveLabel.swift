@@ -8,9 +8,13 @@
 import SwiftArgParse
 import BrewExtension
 
-struct BrewExtensionRemoveLabel: Executor {
-    func run(with context: ASTContext) {
-        let label = context.unnamedParams[0] as! String
+struct BrewExtensionRemoveLabel: Command {
+    func setup(with config: Configuration) {
+        config.usePathOption()
+        config.use(Parameter(type: String.self))
+    }
+    func run(with context: CommandContext) {
+        let label = context.parameters[0] as! String
         let cache = EncodableDataSource.load(with: context)
 
         cache.removeLabel(label)

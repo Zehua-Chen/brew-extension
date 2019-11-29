@@ -10,8 +10,11 @@ import Foundation
 import BrewExtension
 
 extension EncodableDataSource {
-    static func load(with context: ASTContext) -> EncodableDataSource {
-        guard let data = try? Data(contentsOf: .init(fileURLWithPath: context.namedParams["--path"] as! String)) else {
+
+    static var defaultPath = "\(NSHomeDirectory())/.brew-extension"
+
+    static func load(with context: CommandContext) -> EncodableDataSource {
+        guard let data = try? Data(contentsOf: .init(fileURLWithPath: context.options["--path"] as! String)) else {
             return .init()
         }
 
@@ -19,8 +22,8 @@ extension EncodableDataSource {
         return try! decoder.decode(EncodableDataSource.self, from: data)
     }
 
-    func save(with context: ASTContext) {
-        let url = URL(fileURLWithPath: context.namedParams["--path"] as! String)
+    func save(with context: CommandContext) {
+        let url = URL(fileURLWithPath: context.options["--path"] as! String)
         let encoder = JSONEncoder()
 
         try! (try! encoder.encode(self)).write(to: url)

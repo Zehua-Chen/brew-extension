@@ -8,8 +8,12 @@
 import SwiftArgParse
 import BrewExtension
 
-struct BrewExtensionListLabels: Executor {
-    func run(with context: ASTContext) {
+struct BrewExtensionListLabels: Command {
+    func setup(with config: Configuration) {
+        config.usePathOption()
+    }
+    
+    func run(with context: CommandContext) {
         let cache = EncodableDataSource.load(with: context)
         let labels = cache.labels()
 
